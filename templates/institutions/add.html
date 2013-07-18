@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<form action="{% url "inst-add" %}" method="POST">
+    {% csrf_token %}
+    {{ inst_form }}
+    <input type="submit" />
+</form>
+</body>
+</html>

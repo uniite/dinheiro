@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if institutions %}
+        {% for inst in institutions %}
+            <a href="{% url "inst-show" inst.pk %}">{{ inst.url }}</a><br />
+        {% endfor %}
+    {% else %}
+        No Institutions Added
+    {% endif %}
+{% endblock %}

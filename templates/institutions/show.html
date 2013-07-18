@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+Org: {{ inst.org }}<br />
+<h3>Accounts:</h3>
+    {% for number, acct in accounts.items %}
+        Number: {{ number }}<br />
+        Description: {{ acct.description }}<br />
+        Balance: {{ acct.statement.balance }} {{ acct.statement.currency|upper }}<br />
+        Available Credit: {{ acct.statement.available_balance }} {{ acct.statement.currency|upper }}<br />
+
+        <ul>
+            {% for t in acct.statement.transactions %}
+                <li>{{ t.date }} - {{ t.payee }} - {{ t.type }} | {{ t.amount }}</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}
