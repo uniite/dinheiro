@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'Institution'
-        db.create_table(u'institutions_institution', (
+        db.create_table(u'finance_institution', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('fid', self.gf('django.db.models.fields.IntegerField')()),
             ('org', self.gf('django.db.models.fields.CharField')(max_length=50)),
@@ -17,22 +17,22 @@ class Migration(SchemaMigration):
             ('username', self.gf('django.db.models.fields.CharField')(max_length=50)),
             ('password', self.gf('django.db.models.fields.CharField')(max_length=128)),
         ))
-        db.send_create_signal(u'institutions', ['Institution'])
+        db.send_create_signal(u'finance', ['Institution'])
 
         # Adding unique constraint on 'Institution', fields ['fid', 'username']
-        db.create_unique(u'institutions_institution', ['fid', 'username'])
+        db.create_unique(u'finance_institution', ['fid', 'username'])
 
 
     def backwards(self, orm):
         # Removing unique constraint on 'Institution', fields ['fid', 'username']
-        db.delete_unique(u'institutions_institution', ['fid', 'username'])
+        db.delete_unique(u'finance_institution', ['fid', 'username'])
 
         # Deleting model 'Institution'
-        db.delete_table(u'institutions_institution')
+        db.delete_table(u'finance_institution')
 
 
     models = {
-        u'institutions.institution': {
+        u'finance.institution': {
             'Meta': {'unique_together': "(('fid', 'username'),)", 'object_name': 'Institution'},
             'fid': ('django.db.models.fields.IntegerField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -43,4 +43,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['institutions']
+    complete_apps = ['finance']

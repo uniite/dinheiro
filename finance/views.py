@@ -3,18 +3,21 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from ofxhome import OFXHome
 
-from institutions.forms import InstitutionForm
-from institutions.models import Institution
+from finance.forms import InstitutionForm
+from finance.models import Institution
 
 
 def add(request, id):
 	inst = Institution()
 	if request.method == "GET":
-		info = OFXHome.lookup(id)
-		inst.fid = info.fid
-		inst.org = info.org
-		inst.url = info.url
-		form = InstitutionForm(instance=inst)
+		if id:
+			info = OFXHome.lookup(id)
+			inst.fid = info.fid
+			inst.org = info.org
+			inst.url = info.url
+			form = InstitutionForm(instance=inst)
+		else:
+			pass
 	elif request.method == "POST":
 		form = InstitutionForm(data=request.POST, instance=inst)
 		if form.is_valid():
@@ -26,7 +29,7 @@ def add(request, id):
 	return render(request, "institutions/add.html", {"inst_form": form})
 
 def index(request):
-	return render(request, "institutions/index.html", {"institutions": Institution.objects.all()})
+	return render(request, "institutions/index.html", {"finance": Institution.objects.all()})
 
 def search(request):
 	if "q" in request.GET:

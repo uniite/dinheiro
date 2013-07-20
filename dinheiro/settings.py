@@ -134,8 +134,7 @@ INSTALLED_APPS = (
 	'south',
 
 	# First-party
-    'accounts',
-	'institutions',
+	'finance',
 )
 
 # A sample logging configuration. The only tangible logging

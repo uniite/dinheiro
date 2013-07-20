@@ -1,6 +1,6 @@
 from django import forms
 
-from institutions.models import Institution
+from finance.models import Institution
 
 
 class InstitutionForm(forms.ModelForm):

@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <h3>Institutions</h3>
+    <a href="{% url "inst-add" %}"><button class="btn">Add</button></a>
+    <br />
+    <br />
     {% if institutions %}
         {% for inst in institutions %}
             <a href="{% url "inst-show" inst.pk %}">{{ inst.url }}</a><br />
