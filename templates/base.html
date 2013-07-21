@@ -11,12 +11,14 @@
         {% endblock meta-tags %}
 
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css">
         <style>
-          body {
-            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-          }
+            /* Ensure the body starts below the top navbar
+             * (See "Fixed to top" on http://twitter.github.io/bootstrap/components.html#navbar */
+            body {
+                padding-top: 60px;
+            }
         </style>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css">
         {% block css %}
         {% endblock %}
 

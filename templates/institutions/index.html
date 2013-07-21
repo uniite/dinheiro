@@ -7,7 +7,7 @@
     <br />
     {% if institutions %}
         {% for inst in institutions %}
-            <a href="{% url "inst-show" inst.pk %}">{{ inst.url }}</a><br />
+            <a href="{% url "inst-show" inst.pk %}">{{ inst.name }}</a><br />
         {% endfor %}
     {% else %}
         No Institutions Added

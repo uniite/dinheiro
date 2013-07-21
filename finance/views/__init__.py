@@ -12,9 +12,11 @@ def add(request, id):
 	if request.method == "GET":
 		if id:
 			info = OFXHome.lookup(id)
+			inst.name = info.name
 			inst.fid = info.fid
 			inst.org = info.org
 			inst.url = info.url
+			inst.clean()
 			form = InstitutionForm(instance=inst)
 		else:
 			pass
@@ -29,7 +31,7 @@ def add(request, id):
 	return render(request, "institutions/add.html", {"inst_form": form})
 
 def index(request):
-	return render(request, "institutions/index.html", {"finance": Institution.objects.all()})
+	return render(request, "institutions/index.html", {"institutions": Institution.objects.all()})
 
 def search(request):
 	if "q" in request.GET:
@@ -41,7 +43,7 @@ def search(request):
 def show(request, pk):
 	inst = get_object_or_404(Institution, pk=pk)
 	accounts = {}
-	for acct in inst.accounts():
+	for acct in inst.account_set.all():
 		stmt = acct.statement(days=7)
 		accounts[acct.number] = {
 			"description": acct.description,
