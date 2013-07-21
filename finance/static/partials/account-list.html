@@ -1,0 +1,9 @@
+<h1>Accounts</h1>
+
+<div>
+    <div class="span6" ng-repeat="account in accounts">
+        <strong>Name:</strong> {{ account.name }}<br />
+        <strong>Account Number:</strong> {{ account.censored_account_number }}<br />
+        <a class="btn" href="#/accounts/{{ account.id }}">View</a>
+    </div>
+</div>

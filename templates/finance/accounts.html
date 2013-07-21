@@ -3,22 +3,22 @@
 {% block scripts %}
 <script>
 angular.module("Dinheiro", ["ngResource"]).
-  config(['$routeProvider', function($routeProvider) {
-  $routeProvider.
-      when('/accounts', {templateUrl: 'partials/account-list.html',   controller: AccountController}).
-      when('/accounts/:id', {templateUrl: 'partials/account-detail.html', controller: AccountController}).
-      otherwise({redirectTo: '/phones'});
+    config(['$routeProvider', function($routeProvider) {
+    $routeProvider.
+      when('/accounts', {templateUrl: '/static/partials/account-list.html',   controller: AccountListCtrl}).
+      when('/accounts/:id', {templateUrl: '/static/partials/account-detail.html', controller: AccountDetailCtrl}).
+      otherwise({redirectTo: '/accounts'});
 }]);
 
-function AccountController($scope, $http, $resource) {
-    var Account = $resource("/finance/api/accounts/:id?format=json");
+function AccountListCtrl($scope, $http) {
     $http.get("/finance/api/accounts/?format=json").success(function(accounts) {
         $scope.accounts = accounts;
     });
+}
 
-    $scope.showAccount = function(id) {
-        alert("Showing account: " + id);
-    }
+function AccountDetailCtrl($scope, $routeParams, $resource) {
+    var Account = $resource("/finance/api/accounts/:id?format=json");
+    $scope.account = Account.get({id: $routeParams.id});
 }
 </script>
 {% endblock %}
@@ -26,13 +26,5 @@ function AccountController($scope, $http, $resource) {
 {% block content %}
 {% verbatim %}
     <div ng-view></div>
-    <h1>Accounts</h1>
-    <div ng-app="Dinheiro" ng-controller="AccountController">
-    <div class="span6" ng-repeat="account in accounts">
-        <strong>Name:</strong> {{ account.name }}<br />
-        <strong>Account Number:</strong> {{ account.censored_account_number }}<br />
-        <a class="btn" href="#/accounts/{{ account.id }}">View</a>
-    </div>
-    </div>
 {% endverbatim %}
 {% endblock %}

@@ -1,10 +1,11 @@
 from django.conf.urls import patterns, include, url
+from django.contrib import admin
 
+from dinheiro import settings
 from dinheiro.views import HomeView
 from finance.views.transactions import TransactionListView
 
-# Uncomment the next two lines to enable the admin:
-from django.contrib import admin
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -21,3 +22,10 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 )
+
+"""if settings.DEBUG:
+	urlpatterns += patterns('',
+		(r'^%s/(?P<path>.*)$' % settings, 'django.views.static.serve',
+        	{'document_root': settings., 'show_indexes': True})
+	)
+"""
