@@ -131,6 +131,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 
 	# Third-party
+	'rest_framework',
 	'south',
 
 	# First-party

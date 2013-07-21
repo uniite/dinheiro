@@ -22,6 +22,16 @@
         {% block css %}
         {% endblock %}
 
+        {% block script-libraries %}
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.1.5/angular.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.1.5/angular-resource.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.js"></script>
+        {% endblock script-libraries %}
+
+        {% block scripts %}
+        {% endblock scripts %}
+
         {% block extrahead %}{% endblock %}
     </head>
     <body>
@@ -40,7 +50,7 @@
                         <ul class="nav">
                             <li class="active"><a href="{% url "inst-index" %}">Home</a></li>
                             <li><a href="{% url "inst-search" %}">Search</a></li>
-                            <li><a href="#contact">Contact</a></li>
+                            <li><a href="{% url "transactions-list" %}">Transactions</a></li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
@@ -74,13 +84,5 @@
 
         </div>
         {% endblock container %}
-
-        {% block script-libraries %}
-            <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-            <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.js"
-        {% endblock script-libraries %}
-        {% block scripts %}
-            <!-- script src="js/main.js"></script -->
-        {% endblock scripts %}
     </body>
 </html>

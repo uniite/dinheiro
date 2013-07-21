@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script>
+angular.module("Dinheiro", ["ngResource"]).
+  config(['$routeProvider', function($routeProvider) {
+  $routeProvider.
+      when('/accounts', {templateUrl: 'partials/account-list.html',   controller: AccountController}).
+      when('/accounts/:id', {templateUrl: 'partials/account-detail.html', controller: AccountController}).
+      otherwise({redirectTo: '/phones'});
+}]);
+
+function AccountController($scope, $http, $resource) {
+    var Account = $resource("/finance/api/accounts/:id?format=json");
+    $http.get("/finance/api/accounts/?format=json").success(function(accounts) {
+        $scope.accounts = accounts;
+    });
+
+    $scope.showAccount = function(id) {
+        alert("Showing account: " + id);
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+{% verbatim %}
+    <div ng-view></div>
+    <h1>Accounts</h1>
+    <div ng-app="Dinheiro" ng-controller="AccountController">
+    <div class="span6" ng-repeat="account in accounts">
+        <strong>Name:</strong> {{ account.name }}<br />
+        <strong>Account Number:</strong> {{ account.censored_account_number }}<br />
+        <a class="btn" href="#/accounts/{{ account.id }}">View</a>
+    </div>
+    </div>
+{% endverbatim %}
+{% endblock %}

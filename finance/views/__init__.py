@@ -3,8 +3,38 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from ofxhome import OFXHome
 
-from finance.forms import InstitutionForm
-from finance.models import Institution
+
+from finance.serializers import AccountSerializer, InstitutionSerializer, TransactionSerializer
+from finance.models import Account, Institution, Transaction
+from rest_framework import generics, viewsets
+from rest_framework.fields import SerializerMethodField
+
+
+
+
+
+class AccountViewSet(viewsets.ReadOnlyModelViewSet):
+	"""
+	This viewset automatically provides `list` and `detail` actions.
+	"""
+	queryset = Account.objects.all()
+	serializer_class = AccountSerializer
+
+
+class InstitutionSerializer(viewsets.ReadOnlyModelViewSet):
+	"""
+	This viewset automatically provides `list` and `detail` actions.
+	"""
+	queryset = Institution.objects.all()
+	serializer_class = InstitutionSerializer
+
+
+class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
+	"""
+	This viewset automatically provides `list` and `detail` actions.
+	"""
+	queryset = Transaction.objects.all()
+	serializer_class = TransactionSerializer
 
 
 def add(request, id):

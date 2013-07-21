@@ -149,6 +149,8 @@ class Account(models.Model):
 	# they aren't normally used in mathematical operations (except checksums),
 	# and they might contain letters in special cases (in which case we can just change the validator)
 	account_number = models.CharField(max_length=50, validators=[number_validator])
+	# User-defined name for the account, to identify it (since we don't want to toss around the account number)
+	name = models.CharField(max_length=50)
 
 	## Optional fields
 	# Same goes for routing number (although I'm not sure about the length)
@@ -160,6 +162,13 @@ class Account(models.Model):
 
 	class Meta:
 		unique_together = ("institution", "account_number")
+
+	def censored_account_number(self):
+		""" The account number with all but the last four (or less) digits censored. """
+		# (eg. "1234" => "***4", "12345678910" => "*******8910")
+		show_digits = max(4, len(self.account_number) // 2.5)
+		return ((len(self.account_number) - 4) * "*") + self.account_number[-4:]
+
 
 
 four_digit_validators = [validators.MinValueValidator(0), validators.MaxValueValidator(4)]
