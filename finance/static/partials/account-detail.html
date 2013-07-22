@@ -1,8 +1,24 @@
 <h1>Account Details</h1>
 
 <div>
-    <div class="span6">
+    <div class="span12">
         <strong>Name:</strong> {{ account.name }}<br />
         <strong>Account Number:</strong> {{ account.censored_account_number }}<br />
+    </div>
+    <div class="sapn12">
+        <table class="table">
+            <thead>
+                <th>Date</th>
+                <th>Payee</th>
+                <th>Type</th>
+                <th>Amount</th>
+            </thead>
+            <tr ng-repeat="t in transactions">
+                <td>{{ t.date }}</td>
+                <td>{{ t.payee }}</td>
+                <td>{{ t.type }}</td>
+                <td style="text-align: right;">{{ t.amount }}</td>
+            </tr>
+        </table>
     </div>
 </div>
