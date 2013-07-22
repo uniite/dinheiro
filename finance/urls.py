@@ -12,15 +12,15 @@ router.register(r'accounts', views.AccountViewSet)
 router.register(r'transactions', views.TransactionViewSet)
 
 class AccountsView(TemplateView):
-	template_name = "finance/accounts.html"
+    template_name = "finance/accounts.html"
 
 
 urlpatterns = patterns('',
-	url(r'^accounts/?$', AccountsView.as_view()),
-	url(r'^api/', include(router.urls)),
-	url(r'^$', 'finance.views.index', name='inst-index'),
-	url(r'^institutions/(\d+)?$', 'finance.views.show', name='inst-show'),
-	url(r'^finance/add/(\d+)?$', 'finance.views.add', name='inst-add'),
-	url(r'^finance/search/?$', 'finance.views.search', name='inst-search'),
-	url(r'^transactions/?$', TransactionListView.as_view(), name='transactions-list'),
+        url(r'^accounts/?$', AccountsView.as_view()),
+        url(r'^api/', include(router.urls)),
+        url(r'^$', 'finance.views.index', name='inst-index'),
+        url(r'^institutions/(\d+)?$', 'finance.views.show', name='inst-show'),
+        url(r'^finance/add/(\d+)?$', 'finance.views.add', name='inst-add'),
+        url(r'^finance/search/?$', 'finance.views.search', name='inst-search'),
+        url(r'^transactions/?$', TransactionListView.as_view(), name='transactions-list'),
 )

@@ -5,7 +5,7 @@ from finance.models import Account, Transaction
 
 
 class TransactionListView(ListView):
-	model = Transaction
+    model = Transaction
 
 
 class AccountTransactionsListView(ListView):

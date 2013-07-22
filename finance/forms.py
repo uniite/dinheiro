@@ -4,7 +4,7 @@ from finance.models import Institution
 
 
 class InstitutionForm(forms.ModelForm):
-	password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(widget=forms.PasswordInput)
 
-	class Meta:
-		model = Institution
+    class Meta:
+        model = Institution

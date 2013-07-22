@@ -3,4 +3,4 @@ from finance.models import Account, Transaction
 
 
 class InstitutionList(ListView):
-	model = Transaction
+    model = Transaction
