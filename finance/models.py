@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 from StringIO import StringIO
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.core import validators
 from django.utils import timezone
@@ -56,12 +57,17 @@ class Institution(models.Model):
     Note that no financial information is stored here (see Account).
     """
 
+    owner = models.ForeignKey(User)
+    # Financial institution ID?
     fid = models.IntegerField()
+    # Some sort of OFX organization ID
     org = models.CharField(max_length=50)
+    # OFX API endpoint
     url = models.CharField(max_length=255)
+    # Credentials (careful, these are the user's online banking credentials)
     username = models.CharField(max_length=50)
     password = models.CharField(max_length=128)
-    # The name of the institution (from OFXHome or similar)
+    # The name of the institution (from OFXHome or user-defined)
     name = models.CharField(max_length=255, default="Unknown")
 
     class Meta:
