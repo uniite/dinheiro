@@ -2,7 +2,11 @@
 
 {% block scripts %}
 <script>
-var app = angular.module("Dinheiro", ["ngResource"]);
+var app = angular.module("Dinheiro", ["restangular"]);
+
+app.config(function(RestangularProvider) {
+    RestangularProvider.setBaseUrl("/finance/api");
+});
 
 app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.
@@ -13,23 +17,67 @@ app.config(['$routeProvider', function($routeProvider) {
       otherwise({redirectTo: '/'});
 }]);
 
-app.factory("Account", function ($resource) {
-    return $resource("/finance/api/accounts/:id?format=json", {id: "@id"});
-});
-app.factory("Transaction", function ($resource) {
-    return $resource("/finance/api/transactions/:id?format=json", {id: "@id"});
+function apiErrorHandler() {
+    alert("Something broke!");
+}
+
+app.factory("Model", function (Restangular) {
+    return function (name) {
+        return {
+            "all": Restangular.all(name).getList,
+            "get": function (id) {
+                return Restangular.one(name, id).get();
+            }
+        };
+    };
 });
 
-app.controller("AccountListCtrl", ["$scope", "Account",
-    function AccountListCtrl($scope, Account) {
-        $scope.accounts = Account.query();
-}]);
+app.factory("accounts", function (Model) {
+    return Model("accounts")
+});
+app.factory("transactions", function (Model) {
+    return Model("transactions")
+});
 
-app.controller("AccountDetailCtrl", ["$scope", "$routeParams", "Account", "Transaction",
-    function AccountDetailCtrl($scope, $routeParams, Account, Transaction) {
-        $scope.account = Account.get({id: $routeParams.id});
-        $scope.transactions = Transaction.query();
-}]);
+app.controller("AccountListCtrl", function ($scope, accounts) {
+    accounts.all().then(function (result) {
+        $scope.accounts = result;
+    }, apiErrorHandler);
+});
+
+app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, accounts, transactions) {
+    accounts.get($routeParams.id).then(function (result) {
+        $scope.account = result;
+    }, apiErrorHandler);
+    transactions.all().then(function (result) {
+        $scope.transactions = result;
+    }, apiErrorHandler);
+    Restangular.all("stats").getList().then(function (stats) {
+        var timeSeries = stats.map(function(point) {
+            return [
+                (new Date(point.day)).getTime(),
+                parseFloat(point.total_amount)
+            ];
+        });
+        console.log(timeSeries);
+        var oneDay = 24 * 3600 * 1000;
+        $("#time-chart").plot([
+            {
+                data: timeSeries,
+                color: "rgb(30, 180, 20)",
+                threshold: { below: 0, color: "rgb(200, 20, 30)" }
+            }
+        ], {
+            bars: {
+                barWidth: oneDay * 0.6,
+                show: true
+            },
+            xaxis: {
+                mode: "time"
+            }
+        });
+    });
+});
 </script>
 {% endblock %}
 

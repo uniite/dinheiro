@@ -1,41 +1,13 @@
+import django.db
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from ofxhome import OFXHome
 
-
 from finance.forms import InstitutionForm
 from finance.models import Account, Institution, Transaction
-from finance.serializers import AccountSerializer, InstitutionSerializer, TransactionSerializer
-from rest_framework import generics, viewsets
-from rest_framework.fields import SerializerMethodField
 
-
-
-
-
-class AccountViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    This viewset automatically provides `list` and `detail` actions.
-    """
-    queryset = Account.objects.all()
-    serializer_class = AccountSerializer
-
-
-class InstitutionSerializer(viewsets.ReadOnlyModelViewSet):
-    """
-    This viewset automatically provides `list` and `detail` actions.
-    """
-    queryset = Institution.objects.all()
-    serializer_class = InstitutionSerializer
-
-
-class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    This viewset automatically provides `list` and `detail` actions.
-    """
-    queryset = Transaction.objects.all()
-    serializer_class = TransactionSerializer
+import api
 
 
 def add(request, id):

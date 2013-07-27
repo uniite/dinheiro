@@ -6,10 +6,11 @@ from finance.views.transactions import TransactionListView
 
 from rest_framework.routers import DefaultRouter
 
-# Create a router and register our viewsets with it.
-router = DefaultRouter()
-router.register(r'accounts', views.AccountViewSet)
-router.register(r'transactions', views.TransactionViewSet)
+# Create a router and register our viewsets with it
+router = DefaultRouter(trailing_slash=False)
+router.register(r'accounts', views.api.AccountViewSet)
+router.register(r'transactions', views.api.TransactionViewSet)
+router.register(r'stats', views.api.StatsViewSet, base_name="stats")
 
 class AccountsView(TemplateView):
     template_name = "finance/accounts.html"
