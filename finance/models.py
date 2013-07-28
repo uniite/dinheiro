@@ -208,6 +208,9 @@ class Transaction(models.Model):
     # The type of trasnsaction (eg. "debit")
     type = models.CharField(blank=True, max_length=50)
 
+    # User-defined optional fields
+    category = models.ForeignKey("Category", blank=True, null=True)
+
     def clean(self):
         # Have to clean IntegerFields myself, since Django uses int to validate them (which isn't very forgiving)
         for attr in [f.name for f in self._meta.fields if isinstance(f, models.IntegerField)]:
@@ -221,3 +224,37 @@ class Transaction(models.Model):
         ordering = ["-date"]
         get_latest_by = "date"
         unique_together = ("account", "transaction_id")
+
+
+
+
+class Category(models.Model):
+    """
+    A category for classifying with Transactions, to allow budgeting.
+    """
+    name = models.CharField(max_length=50)
+    parent = models.ForeignKey("self")
+
+
+class CategoryRule(models.Model):
+    """
+    Represents logic for categorization of Transactions,
+    """
+    RULE_TYPES = (
+        ("contains", "Contains"),
+        ("starts_with", "Starts With"),
+        ("ends_with", "Ends With"),
+    )
+    TRANSACTION_FIELDS = (
+        ("date", "Date"),
+        ("payee", "Payee"),
+        ("type", "Type"),
+    )
+    # The type of string matching to use (may expand to logic types in the future)
+    type = models.CharField(max_length=10, choices=RULE_TYPES, default="contains")
+    # The field to match against (in the Transaction)
+    field = models.CharField(max_length=20, choices=TRANSACTION_FIELDS, default="payee")
+    # Text to match against (may contain logic in the future, for new rule types)
+    content = models.TextField()
+    # The Category to apply if the matched
+    category = models.ForeignKey(Category)
