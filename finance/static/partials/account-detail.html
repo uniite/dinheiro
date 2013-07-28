@@ -25,7 +25,7 @@
             <th>Amount</th>
         </thead>
         <tr ng-repeat="t in transactions | filter:search_text">
-            <td>{{ t.date }}</td>
+            <td>{{ t.formatted_date }}</td>
             <td>{{ t.payee }}</td>
             <td>{{ t.type }}</td>
             <td style="text-align: right;">{{ t.amount }}</td>

@@ -32,25 +32,29 @@ app.factory("Model", function (Restangular) {
     };
 });
 
-app.factory("accounts", function (Model) {
+app.factory("Accounts", function (Model) {
     return Model("accounts")
 });
-app.factory("transactions", function (Model) {
+app.factory("Transactions", function (Model) {
     return Model("transactions")
 });
 
-app.controller("AccountListCtrl", function ($scope, accounts) {
-    accounts.all().then(function (result) {
-        $scope.accounts = result;
+app.controller("AccountListCtrl", function ($scope, Accounts) {
+    Accounts.all().then(function (accounts) {
+        $scope.accounts = accounts;
     }, apiErrorHandler);
 });
 
-app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, accounts, transactions) {
-    accounts.get($routeParams.id).then(function (result) {
-        $scope.account = result;
+app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, Accounts, Transactions) {
+    Accounts.get($routeParams.id).then(function (account) {
+        $scope.account = account;
     }, apiErrorHandler);
-    transactions.all().then(function (result) {
-        $scope.transactions = result;
+    Transactions.all().then(function (transactions) {
+        for (var i=0; i < transactions.length; i++) {
+            transactions[i].date = moment(transactions[i].date);
+            transactions[i].formatted_date = transactions[i].date.format("dddd, MMMM Do YYYY, HH:mm A");
+        }
+        $scope.transactions = transactions;
     }, apiErrorHandler);
     Restangular.one("stats", "").get().then(function (stats) {
         function parseTimeSeries(data) {
