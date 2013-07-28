@@ -39,6 +39,8 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
 class StatsViewSet(viewsets.ViewSet):
     def list(self, request, format=None ):
         truncate_date = django.db.connection.ops.date_trunc_sql("day", "date")
-        return Response(
-            Transaction.objects.extra({"day": truncate_date}).values("day").annotate(total_amount=Sum("amount")).order_by("day")
-        )
+        query = Transaction.objects.extra({"day": truncate_date}).values("day").annotate(total_amount=Sum("amount")).order_by("day")
+        return Response({
+            "deposits": query.filter(amount__gte=0),
+            "withdrawals": query.filter(amount__lt=0)
+        })

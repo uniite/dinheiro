@@ -52,22 +52,27 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
     transactions.all().then(function (result) {
         $scope.transactions = result;
     }, apiErrorHandler);
-    Restangular.all("stats").getList().then(function (stats) {
-        var timeSeries = stats.map(function(point) {
-            return [
-                (new Date(point.day)).getTime(),
-                parseFloat(point.total_amount)
-            ];
-        });
-        console.log(timeSeries);
+    Restangular.one("stats", "").get().then(function (stats) {
+        function parseTimeSeries(data) {
+            return data.map(function(point) {
+                return [
+                    (new Date(point.day)).getTime(),
+                    parseFloat(point.total_amount)
+                ];
+            });
+        }
         var oneDay = 24 * 3600 * 1000;
-        $("#time-chart").plot([
-            {
-                data: timeSeries,
-                color: "rgb(30, 180, 20)",
-                threshold: { below: 0, color: "rgb(200, 20, 30)" }
+        $scope.timeChart = $("#time-chart").plot([
+            /*{
+                data: parseTimeSeries(stats.deposits),
+                color: "rgb(30, 180, 20)"
+                //threshold: { below: 0, color: "rgb(200, 20, 30)" }
+            },*/ {
+                data: parseTimeSeries(stats.withdrawals),
+                color: "rgb(200, 20, 30)"
             }
-        ], {
+        ],
+        {
             bars: {
                 barWidth: oneDay * 0.6,
                 show: true
