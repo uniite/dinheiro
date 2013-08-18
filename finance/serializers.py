@@ -9,7 +9,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ("id", "censored_account_number", "name")
+        fields = ("id", "balance", "censored_account_number", "name")
 
     def get_censored_account_number(self, account):
         return account.censored_account_number()

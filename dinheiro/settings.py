@@ -129,12 +129,13 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 
-        # Third-party
-        'rest_framework',
-        'south',
+    # Third-party
+    'django_filters',
+    'rest_framework',
+    'south',
 
-        # First-party
-        'finance',
+    # First-party
+    'finance',
 )
 
 # A sample logging configuration. The only tangible logging

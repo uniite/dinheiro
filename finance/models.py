@@ -73,12 +73,10 @@ class Institution(models.Model):
     class Meta:
         unique_together = ("fid", "username")
 
-
     def clean(self):
         self.name = self.name.strip()
         self.org = self.org.strip()
         self.url = self.url.strip()
-
 
     def sync(self):
         """
@@ -176,7 +174,6 @@ class Account(models.Model):
         return ((len(self.account_number) - 4) * "*") + self.account_number[-4:]
 
 
-
 four_digit_validators = [validators.MinValueValidator(0), validators.MaxValueValidator(4)]
 class Transaction(models.Model):
     """ A financial transaction, belonging to an account. """
@@ -205,7 +202,7 @@ class Transaction(models.Model):
     # Optional
     # http://en.wikipedia.org/wiki/Standard_Industrial_Classification
     sic = models.IntegerField(blank=True, null=True, validators=four_digit_validators)
-    # The type of trasnsaction (eg. "debit")
+    # The type of transaction (eg. "debit")
     type = models.CharField(blank=True, max_length=50)
 
     # User-defined optional fields
@@ -224,8 +221,6 @@ class Transaction(models.Model):
         ordering = ["-date"]
         get_latest_by = "date"
         unique_together = ("account", "transaction_id")
-
-
 
 
 class Category(models.Model):
