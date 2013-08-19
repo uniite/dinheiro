@@ -1,7 +1,11 @@
 <div class="span12">
     <h1>Account Details</h1>
+</div>
+<div class="span12">
     <strong>Name:</strong> {{ account.name }}<br />
     <strong>Account Number:</strong> {{ account.censored_account_number }}<br />
+    <strong>Balance:</strong> {{ account.balance }}<br />
+    <button class="btn blue" ng-click="sync(account, $event)">Sync</button>
 </div>
 
 <div class="span6" style="padding-top: 1em">
@@ -24,7 +28,7 @@
             <th>Type</th>
             <th>Amount</th>
         </thead>
-        <tr ng-repeat="t in transactions | filter:search_text">
+        <tr ng-repeat="t in transactions | filter:search_text | orderBy:sort_field track by t.id">
             <td>{{ t.formatted_date }}</td>
             <td>{{ t.payee }}</td>
             <td>{{ t.type }}</td>

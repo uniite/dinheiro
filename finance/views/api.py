@@ -1,8 +1,8 @@
 import django.db
 from django.db.models import Sum
 import django_filters
-from rest_framework import generics, viewsets
-from rest_framework.decorators import link
+from rest_framework import generics, filters, viewsets
+from rest_framework.decorators import action, link
 from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -27,6 +27,12 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
 
+    @action()
+    def sync(self, request, format=None, pk=None):
+        account = self.get_object()
+        new_trx = account.sync()
+        return Response([TransactionSerializer(t).data for t in new_trx])
+
 
 class InstitutionSerializer(viewsets.ReadOnlyModelViewSet):
     """
@@ -42,10 +48,11 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+    filter_backends = (filters.OrderingFilter,)
 
 
 class StatsViewSet(viewsets.ViewSet):
-    def list(self, request, format=None ):
+    def list(self, request, format=None):
         truncate_date = django.db.connection.ops.date_trunc_sql("day", "date")
         query = Transaction.objects.extra({"day": truncate_date}).values("day").annotate(total_amount=Sum("amount")).order_by("day")
         # TODO: Filter query with user ID

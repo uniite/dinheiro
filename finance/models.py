@@ -80,17 +80,23 @@ class Institution(models.Model):
 
     def sync(self):
         """
-        Synchronizes accounts with financial data retrieved using the instition's OFX API.
+        Synchronizes accounts with financial data retrieved using the institution's OFX API.
 
-        :returns: The number of transactions added.
+        :returns: A list of new :pytype:Transaction objects.
         """
 
         ofx_inst = ofxclient.Institution(str(self.fid), self.org, self.url, self.username, self.password)
 
-        added_transactions = 0
+        new_transactions = []
 
-        # Retrieve a list of the remote instiitution's accounts
-        for ofx_account in ofx_inst.accounts():
+        # Retrieve a list of the remote institution's accounts
+        ofx_accounts = ofx_inst.accounts()
+        # Something is wrong if we couldn't find any accounts...
+        if not ofx_accounts:
+            raise Exception("Could not retrieve account information. "
+                            "This usually means your password has changed or your account is locked.")
+        # Process each account found via OFX
+        for ofx_account in ofx_accounts:
             # If we don't have a copy of the account locally, create it
             # TODO: Detect accounts with changed account numbers (eg. a re-issued credit card)
             local_account, created = self.account_set.get_or_create(account_number=ofx_account.number)
@@ -135,9 +141,9 @@ class Institution(models.Model):
                 local_transaction.full_clean()
                 # TODO: Make it validate transaction_id uniqueness down here (less work for the DB)
                 local_transaction.save()
-                added_transactions += 1
+                new_transactions.append(local_transaction)
 
-        return added_transactions
+        return new_transactions
 
 
 number_validator = validators.RegexValidator(r"^\d+$", "Must be a number")
@@ -172,6 +178,13 @@ class Account(models.Model):
         # (eg. "1234" => "***4", "12345678910" => "*******8910")
         show_digits = max(4, len(self.account_number) // 2.5)
         return ((len(self.account_number) - 4) * "*") + self.account_number[-4:]
+
+    def sync(self):
+        """
+        TODO: Currently it is just an alias for institution.sync
+        (which syncs all the institution's accounts)
+        """
+        return self.institution.sync()
 
 
 four_digit_validators = [validators.MinValueValidator(0), validators.MaxValueValidator(4)]

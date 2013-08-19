@@ -46,17 +46,25 @@ app.controller("AccountListCtrl", function ($scope, Accounts) {
 });
 
 app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, Accounts, Transactions) {
-    Accounts.get($routeParams.id).then(function (account) {
+    var account_id = $routeParams.id;
+    $scope.sort_field = "-date";
+    // Load the account's details
+    Accounts.get(account_id).then(function (account) {
         $scope.account = account;
     }, apiErrorHandler);
-    Transactions.all().then(function (transactions) {
+    $scope.transactions = [];
+    $scope.addTransactions = function(transactions) {
         for (var i=0; i < transactions.length; i++) {
             transactions[i].date = moment(transactions[i].date);
             transactions[i].formatted_date = transactions[i].date.format("dddd, MMMM Do YYYY, HH:mm A");
+            $scope.transactions.push(transactions[i]);
         }
-        $scope.transactions = transactions;
-    }, apiErrorHandler);
-    Restangular.one("stats", "").get().then(function (stats) {
+        //$scope.transactions = transactions;
+    };
+    // Load transaction list
+    Transactions.all().then($scope.addTransactions, apiErrorHandler);
+    // Render the transaction time-chart
+    Restangular.one("stats", "").get({account: account_id}).then(function (stats) {
         function parseTimeSeries(data) {
             return data.map(function(point) {
                 return [
@@ -67,11 +75,11 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
         }
         var oneDay = 24 * 3600 * 1000;
         $scope.timeChart = $("#time-chart").plot([
-            /*{
+            {
                 data: parseTimeSeries(stats.deposits),
                 color: "rgb(30, 180, 20)"
                 //threshold: { below: 0, color: "rgb(200, 20, 30)" }
-            },*/ {
+            }, {
                 data: parseTimeSeries(stats.withdrawals),
                 color: "rgb(200, 20, 30)"
             }
@@ -85,7 +93,36 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
                 mode: "time"
             }
         });
-    });
+    }, apiErrorHandler);
+    // Cleans off the garbage Restangular adds to our responses
+    $scope.cleanResponse = function(response) {
+        var result = [];
+        for (var i = 0; i < response.length; i++) {
+            result.push(response[i]);
+        }
+        return result;
+    };
+    // Setup click events
+    // Sync: Synchronizes the account's transactions with the financial institution's data
+    $scope.sync = function(account, event) {
+        if (!$scope.account) return;
+        // Disable the button while the sync runs
+        var button = $(event.target)
+        button.addClass("disabled").text("Syncing...");
+        var enableButton = function() {
+            button.removeClass("disabled").text("Sync");
+        };
+        $scope.account.post("sync").then(function(new_transactions) {
+            //new_transactions = $scope.cleanResponse(new_transactions);
+            // This seems to be a fast way to extend the array (source: http://jsperf.com/angulararrays)
+            //$scope.transactions = $scope.transactions.concat(new_transactions);
+            $scope.addTransactions(new_transactions);
+            enableButton();
+        }, function(error) {
+            enableButton();
+            apiErrorHandler(error);
+        });
+    };
 });
 </script>
 {% endblock %}
