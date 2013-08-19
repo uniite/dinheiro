@@ -27,6 +27,9 @@ app.factory("Model", function (Restangular) {
             "all": Restangular.all(name).getList,
             "get": function (id) {
                 return Restangular.one(name, id).get();
+            },
+            "one": function(id) {
+                return Restangular.one(name, id);
             }
         };
     };
@@ -62,7 +65,7 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
         //$scope.transactions = transactions;
     };
     // Load transaction list
-    Transactions.all().then($scope.addTransactions, apiErrorHandler);
+    Accounts.one(account_id).getList("transactions").then($scope.addTransactions, apiErrorHandler);
     // Render the transaction time-chart
     Restangular.one("stats", "").get({account: account_id}).then(function (stats) {
         function parseTimeSeries(data) {
