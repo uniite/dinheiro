@@ -1,30 +1,12 @@
 import django.db
 from django.db.models import Sum
 from django.http import Http404
-import django_filters
-from rest_framework import generics, filters, viewsets
+from rest_framework import filters, viewsets
 from rest_framework.decorators import action, link
-from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from finance import models
 from finance import serializers
-
-
-class TransactionsFilter(django_filters.FilterSet):
-    class Meta:
-        model = models.Transaction
-        fields = ["account"]
-
-
-class StatsFilter(django_filters.FilterSet):
-    min_amount = django_filters.NumberFilter("amount", lookup_type="gte")
-    max_amount = django_filters.NumberFilter("amount", lookup_type="lte")
-
-    class Meta:
-        model = models.Transaction
-        fields = ["account", "amount", "category", "currency", "date", "payee"]
 
 
 class AccountViewSet(viewsets.ReadOnlyModelViewSet):
@@ -78,4 +60,3 @@ class StatsViewSet(viewsets.ViewSet):
             "deposits": query.filter(amount__gte=0),
             "withdrawals": query.filter(amount__lt=0)
         })
-
