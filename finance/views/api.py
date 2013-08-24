@@ -5,6 +5,7 @@ from rest_framework import filters, viewsets
 from rest_framework.decorators import action, link
 from rest_framework.response import Response
 
+import finance.filters
 from finance import models
 from finance import serializers
 
@@ -55,7 +56,7 @@ class StatsViewSet(viewsets.ViewSet):
         query = models.Transaction.objects.extra({"day": truncate_date}).values("day").annotate(total_amount=Sum("amount")).order_by("day")
         # TODO: Filter query with user ID
         # TODO: Should require account_id in most cases
-        query = StatsFilter(request.GET, queryset=query).qs
+        query = finance.filters.StatsFilter(request.GET, queryset=query).qs
         return Response({
             "deposits": query.filter(amount__gte=0),
             "withdrawals": query.filter(amount__lt=0)
