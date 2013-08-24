@@ -243,12 +243,28 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     parent = models.ForeignKey("self", blank=True, null=True)
 
+    def apply(self):
+        """ Apply this category to the Transactions it matches. """
+        for t in self.matches():
+            t.category = self
+            t.save()
+
+    def matches(self):
+        """ Find all Transactions that match this category. """
+        # Construct a query based on our rules
+        query = Transaction.objects
+        for rule in self.categoryrule_set.all():
+            # These are easy and efficient, because they map directly to Django ORM filters
+            if rule.type in ("contains", "startswith", "endswith"):
+                filter_field = "%s__%s" % (rule.field, rule.type)
+                query = query.filter(**{filter_field: rule.content})
+        return query
 
 
 
 class CategoryRule(models.Model):
     """
-    Represents logic for categorization of Transactions,
+    Represents logic for categorization of Transactions.
     """
     RULE_TYPES = (
         ("contains", "Contains"),
