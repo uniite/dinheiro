@@ -241,7 +241,9 @@ class Category(models.Model):
     A category for classifying with Transactions, to allow budgeting.
     """
     name = models.CharField(max_length=50)
-    parent = models.ForeignKey("self")
+    parent = models.ForeignKey("self", blank=True, null=True)
+
+
 
 
 class CategoryRule(models.Model):
@@ -250,8 +252,8 @@ class CategoryRule(models.Model):
     """
     RULE_TYPES = (
         ("contains", "Contains"),
-        ("starts_with", "Starts With"),
-        ("ends_with", "Ends With"),
+        ("startswith", "Starts With"),
+        ("endswith", "Ends With"),
     )
     TRANSACTION_FIELDS = (
         ("date", "Date"),
