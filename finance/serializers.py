@@ -14,10 +14,12 @@ class AccountSerializer(serializers.ModelSerializer):
     def get_censored_account_number(self, account):
         return account.censored_account_number()
 
+
 class InstitutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Institution
         fields = ("id", "fid", "org", "url", "username")
+
 
 class TransactionSerializer(serializers.ModelSerializer):
     amount = serializers.SerializerMethodField("get_amount")
@@ -29,10 +31,12 @@ class TransactionSerializer(serializers.ModelSerializer):
     def get_amount(self, transaction):
         return transaction.amount.quantize(Decimal("1.00"))
 
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("id", "name", "parent")
+
 
 class CategoryRuleSerializer(serializers.ModelSerializer):
     class Meta:
