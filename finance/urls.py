@@ -9,7 +9,9 @@ from rest_framework.routers import DefaultRouter
 # Create a router and register our viewsets with it
 router = DefaultRouter(trailing_slash=False)
 router.register(r'accounts', views.api.AccountViewSet)
+router.register(r'categories', views.api.CategoryViewSet)
 router.register(r'transactions', views.api.TransactionViewSet)
+router.register(r'rules', views.api.CategoryRuleViewSet)
 router.register(r'stats', views.api.StatsViewSet, base_name="stats")
 
 class AccountsView(TemplateView):

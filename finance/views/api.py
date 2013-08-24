@@ -60,3 +60,13 @@ class StatsViewSet(viewsets.ViewSet):
             "deposits": query.filter(amount__gte=0),
             "withdrawals": query.filter(amount__lt=0)
         })
+
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Category.objects.all()
+    serializer_class = serializers.CategorySerializer
+
+
+class CategoryRuleViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.CategoryRule.objects.all()
+    serializer_class = serializers.CategoryRuleSerializer

@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from rest_framework import serializers
-from finance.models import Account, Institution, Transaction
+from finance.models import Account, Category, CategoryRule, Institution, Transaction
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -24,7 +24,17 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ("id", "amount", "date", "payee", "type")
+        fields = ("id", "amount", "date", "payee", "type", "category")
 
     def get_amount(self, transaction):
         return transaction.amount.quantize(Decimal("1.00"))
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("id", "name", "parent")
+
+class CategoryRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryRule
+        fields = ("id", "category", "type", "field", "content")
