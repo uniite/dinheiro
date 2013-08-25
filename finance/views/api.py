@@ -3,6 +3,7 @@ from django.db.models import Sum
 from django.http import Http404
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action, link
+from rest_framework import exceptions
 from rest_framework.response import Response
 
 import finance.filters
@@ -51,12 +52,22 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class StatsViewSet(viewsets.ViewSet):
-    def list(self, request, format=None):
-        truncate_date = django.db.connection.ops.date_trunc_sql("day", "date")
-        query = models.Transaction.objects.extra({"day": truncate_date}).values("day").annotate(total_amount=Sum("amount")).order_by("day")
+    def _filtered_stats(self, request, interval):
+        truncate_date = django.db.connection.ops.date_trunc_sql(interval, "date")
+        query = models.Transaction.objects.extra({interval: truncate_date})\
+            .values(interval).annotate(total_amount=Sum("amount")).order_by(interval)
         # TODO: Filter query with user ID
         # TODO: Should require account_id in most cases
-        query = finance.filters.StatsFilter(request.GET, queryset=query).qs
+        return finance.filters.StatsFilter(request.GET, queryset=query).qs
+
+    VALID_INTERVALS = ("day", "month", "year")
+
+    def list(self, request):
+        interval = request.QUERY_PARAMS.get("interval", "day")
+        if not interval in self.VALID_INTERVALS:
+            raise exceptions.ParseError("interval must be one of: %s" % ", ".join(self.VALID_INTERVALS))
+
+        query = self._filtered_stats(request, interval)
         return Response({
             "deposits": query.filter(amount__gte=0),
             "withdrawals": query.filter(amount__lt=0)
