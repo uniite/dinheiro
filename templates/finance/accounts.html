@@ -3,8 +3,11 @@
 {% block scripts %}
 <script>
 
-$("li.active").removeClass("active");
-$("li#accounts-tab").addClass("active");
+$(function() {
+    // Make the Accounts tab the highlighted tab
+    $("li.active").removeClass("active");
+    $("li#accounts-tab").addClass("active");
+});
 
 var app = angular.module("Dinheiro", ["restangular"]);
 
