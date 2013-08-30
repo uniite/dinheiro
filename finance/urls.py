@@ -14,13 +14,19 @@ router.register(r'transactions', views.api.TransactionViewSet)
 router.register(r'rules', views.api.CategoryRuleViewSet)
 router.register(r'stats', views.api.StatsViewSet, base_name="stats")
 
+
 class AccountsView(TemplateView):
     template_name = "finance/accounts.html"
 
 
+class CategoriesView(TemplateView):
+    template_name = "finance/categories.html"
+
+
 urlpatterns = patterns('',
-        url(r'^accounts/?$', AccountsView.as_view(), name='accounts'),
         url(r'^api/', include(router.urls)),
+        url(r'^accounts/?$', AccountsView.as_view(), name='accounts'),
+        url(r'^categories/?$', CategoriesView.as_view(), name='categories'),
         url(r'^$', 'finance.views.index', name='inst-index'),
         url(r'^institutions/?$', 'finance.views.institutions.list', name='inst-list'),
         url(r'^institutions/(\d+)/?$', 'finance.views.show', name='inst-show'),

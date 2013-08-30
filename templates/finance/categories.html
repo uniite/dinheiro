@@ -2,10 +2,6 @@
 
 {% block scripts %}
 <script>
-
-$("li.active").removeClass("active");
-$("li#accounts-tab").addClass("active");
-
 var app = angular.module("Dinheiro", ["restangular"]);
 
 app.config(function(RestangularProvider) {
@@ -42,9 +38,6 @@ app.factory("Model", function (Restangular) {
 app.factory("Accounts", function (Model) {
     return Model("accounts")
 });
-app.factory("Categories", function (Model) {
-    return Model("categories")
-});
 app.factory("Transactions", function (Model) {
     return Model("transactions")
 });
@@ -55,15 +48,13 @@ app.controller("AccountListCtrl", function ($scope, Accounts) {
     }, apiErrorHandler);
 });
 
-app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, Accounts, Categories) {
+app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, Accounts, Transactions) {
     var account_id = $routeParams.id;
     $scope.sort_field = "-date";
     // Load the account's details
     Accounts.get(account_id).then(function (account) {
         $scope.account = account;
     }, apiErrorHandler);
-    $scope.categories = []; //{id: null, name: "(none)"}];
-    $scope.category = null;
     $scope.transactions = [];
     $scope.addTransactions = function(transactions) {
         for (var i=0; i < transactions.length; i++) {
@@ -87,11 +78,11 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
         }
         var oneDay = 24 * 3600 * 1000;
         $scope.timeChart = $("#time-chart").plot([
-            /*{
+            {
                 data: parseTimeSeries(stats.deposits),
                 color: "rgb(30, 180, 20)"
                 //threshold: { below: 0, color: "rgb(200, 20, 30)" }
-            }, */{
+            }, {
                 data: parseTimeSeries(stats.withdrawals),
                 color: "rgb(200, 20, 30)"
             }
@@ -106,22 +97,6 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
             }
         });
     }, apiErrorHandler);
-    // Load categories
-    Categories.all().then(function(categories) {
-        for (var i = 0; i < categories.length; i++) {
-            $scope.categories.push(categories[i]);
-        }
-    });
-    // Category filter function (used on transaction list/table)
-    $scope.categoryFilter = function(transaction) {
-        // No category filter
-        if ($scope.category === null) {
-            return true;
-        // Must match selected category
-        } else {
-            return transaction.category == $scope.category.id;
-        }
-    }
     // Cleans off the garbage Restangular adds to our responses
     $scope.cleanResponse = function(response) {
         var result = [];
@@ -140,12 +115,11 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
         var enableButton = function() {
             button.removeClass("disabled").text("Sync");
         };
-        $scope.account.post("sync").then(function(update) {
+        $scope.account.post("sync").then(function(new_transactions) {
             //new_transactions = $scope.cleanResponse(new_transactions);
             // This seems to be a fast way to extend the array (source: http://jsperf.com/angulararrays)
             //$scope.transactions = $scope.transactions.concat(new_transactions);
-            $scope.account.balance = update.balance;
-            $scope.addTransactions(update.transactions);
+            $scope.addTransactions(new_transactions);
             enableButton();
         }, function(error) {
             enableButton();
