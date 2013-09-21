@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script>
+
+$(function() {
+    // Make the Accounts tab the highlighted tab
+    $("li.active").removeClass("active");
+    $("li#accounts-tab").addClass("active");
+
+    window.app = new DinheiroApp();
+    pager.extendWithPage(app);
+    ko.applyBindings(app);
+    pager.start();
+});
+
+
+var DinheiroApp = function() {
+    var self = this;
+    self.account = ko.observable();
+    self.accounts = ko.observableArray();
+    self.categories = ko.observableArray();
+    self.transactions = ko.observableArray();
+    self.template = ko.observable("accounts-template");
+
+    self.sync = function() {
+        // TODO
+    };
+
+    self.view = function() {
+        console.log('view');
+        self.account(this);
+        $.getJSON(_.string.sprintf("/finance/api/accounts/%s/transactions", this.id()), {}, function(transactions) {
+            addItems(self.transactions, transactions.map(function(t) {
+                t.date = moment(t.date);
+                t.formatted_date = t.date.format("dddd, MMMM Do YYYY, HH:mm A");
+                return t;
+            }));
+        });
+        pager.navigate("account");
+    };
+
+    // It is important to push new items to our cache arrays so we don't break any bindings
+    function addItems(array, items) {
+        // Add them to the cache
+        for (var i = 0; i < items.length; i++) {
+            array.push(ko.mapping.fromJS(items[i]));
+        }
+    }
+
+    function loadModel(name) {
+        $.getJSON("/finance/api/" + name, {}, function(data) {
+            addItems(self[name], data);
+        });
+    }
+
+    loadModel("accounts");
+    loadModel("categories");
+};
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+{% verbatim %}
+<div data-bind="page: {id: 'start', title: 'Accounts'}">
+    <h1>Accounts</h1>
+    <div data-bind="foreach: accounts">
+        <div class="span6">
+            <strong>Name:</strong> <span data-bind="text: name"></span><br />
+            <strong>Account Number:</strong> <span></span><br />
+            <button type="button" class="btn btn-info" data-bind="click: $parent.view">View</button>
+        </div>
+    </div>
+</div>
+<div data-bind="page: {id: 'account', title: 'Account'}">
+    <div class="span12">
+        <h1>Account Details</h1>
+    </div>
+    <div class="span12" data-bind="with: account">
+        <strong>Name:</strong> <span data-bind="text: name"></span><br />
+        <strong>Account Number:</strong> <span data-bind="text: censored_account_number"></span><br />
+        <strong>Balance:</strong> <span data-bind="text: balance"></span><br />
+        <button class="btn blue" data-bind="click: $root.sync">Sync</button>
+    </div>
+
+    <div class="span6" style="padding-top: 1em">
+        <strong>Filter: </strong>
+        <input ng-model="search_text" />
+        <select ng-model="category" data-bind="options: categories">
+            <option value="">(all)</option>
+        </select>
+    </div>
+
+    <div class="span12">
+        <div id="time-chart" style="height: 125px; width: 100%"></div>
+    </div>
+
+    <script>
+    </script>
+
+    <div class="span12">
+        <table class="table">
+            <thead>
+                <th>Date</th>
+                <th>Payee</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+            </thead>
+            <tbody data-bind="foreach: transactions">
+                <tr>
+                    <td data-bind="text: formatted_date"></td>
+                    <td data-bind="text: payee"></td>
+                    <td data-bind="text: type"></td>
+                    <td data-bind="text: category"></td>
+                    <td data-bind="text: amount" style="text-align: right;"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endverbatim %}
+{% endblock %}

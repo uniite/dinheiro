@@ -20,7 +20,8 @@ app.config(['$routeProvider', function($routeProvider) {
       //when('/institutions', {templateUrl: '/static/partials/account-list.html',   controller: "InstitutionListCtrl"}).
       //when('/institutions/:id', {templateUrl: '/static/partials/account-list.html',   controller: "AccountListCtrl"}).
       when('/', {templateUrl: '/static/partials/account-list.html',   controller: "AccountListCtrl"}).
-      when('/details/:id', {templateUrl: '/static/partials/account-detail.html', controller: "AccountDetailCtrl"}).
+      when('/accounts/:id', {templateUrl: '/static/partials/account-detail.html', controller: "AccountDetailCtrl"}).
+      when('/categories/:id/edit', {templateUrl: '/static/partials/category-edit.html', controller: "TransactionEditCtrl"}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -35,6 +36,7 @@ app.factory("Model", function (Restangular) {
             "get": function (id) {
                 return Restangular.one(name, id).get();
             },
+            "name": name,
             "one": function(id) {
                 return Restangular.one(name, id);
             }
@@ -52,32 +54,99 @@ app.factory("Transactions", function (Model) {
     return Model("transactions")
 });
 
-app.controller("AccountListCtrl", function ($scope, Accounts) {
-    Accounts.all().then(function (accounts) {
-        $scope.accounts = accounts;
-    }, apiErrorHandler);
+app.service("modelCache", function($rootScope, Accounts, Categories, Transactions) {
+    var cache = {};
+    var index = {};
+
+    // It is important to push new items to our cache arrays so we don't break any bindings
+    // (rather than just replacing them in the cache object)
+    function addItems(model_name, items) {
+        // Add them to the cache
+        for (var i = 0; i < items.length; i++) {
+            cache[model_name].push(items[i]);
+            // Also add them to the index, just by ID for now
+            index[model_name].byID[items[i].id] = items[i];
+        }
+    }
+
+    function initModel(model) {
+        cache[model.name] = cache[model.name] || [];
+        index[model.name] = index[model.name] || { byID: {} };
+    }
+
+    // These should be automatically generated eventually
+    return {
+        loadModel: function(model) {
+            initModel(model);
+            model.all().then(function (items) {
+                addItems(model.name, items);
+            }, apiErrorHandler);
+        },
+        loadCustom: function(model, items) {
+            initModel(model);
+            addItems(model.name, items);
+            console.log(_.string.sprintf("Loaded %d items", items.length));
+        },
+        getCached: function(model) {
+            initModel(model);
+            return cache[model.name];
+        },
+        findByID: function(model, id) {
+            return index[model.name].byID[id];
+        }
+    }
 });
 
-app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, Accounts, Categories) {
+app.controller("AccountListCtrl", function ($scope, modelCache) {
+    modelCache.loadModel(Accounts);
+    $scope.accounts = modelCache.getCached(Accounts);
+});
+
+app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, Accounts, Categories, Transactions, modelCache) {
     var account_id = $routeParams.id;
     $scope.sort_field = "-date";
-    // Load the account's details
-    Accounts.get(account_id).then(function (account) {
-        $scope.account = account;
+
+    $scope.accounts = modelCache.getCached(Accounts);
+    if (!$scope.accounts) {
+        modelCache.loadModel(Accounts);
+    }
+    $scope.account = modelCache.findByID(Accounts, account_id);
+
+    modelCache.loadModel(Categories);
+    $scope.categories = modelCache.getCached(Categories);
+
+    // Transaction loading
+    Accounts.one(account_id).getList("transactions").then(function(transactions) {
+        modelCache.loadCustom(Transactions, transactions.map(function(t) {
+            t.date = moment(t.date);
+            t.formatted_date = t.date.format("dddd, MMMM Do YYYY, HH:mm A");
+            var category_id = t.category;
+            t.category = function() {
+                var default_category = {name: "none"};
+
+                if (!$scope.categories) {
+                    console.warn("FAIL");
+                    return default_category;
+                }
+
+                var matches = $scope.categories.filter(function(c) {
+                    return c.id == category_id;
+                });
+
+
+                if (matches.length == 0)
+                    return default_category;
+
+                console.log(matches[0]);
+                return matches[0];
+            }
+            return t;
+        }));
     }, apiErrorHandler);
-    $scope.categories = []; //{id: null, name: "(none)"}];
+    $scope.transactions = modelCache.getCached(Transactions);
+
     $scope.category = null;
-    $scope.transactions = [];
-    $scope.addTransactions = function(transactions) {
-        for (var i=0; i < transactions.length; i++) {
-            transactions[i].date = moment(transactions[i].date);
-            transactions[i].formatted_date = transactions[i].date.format("dddd, MMMM Do YYYY, HH:mm A");
-            $scope.transactions.push(transactions[i]);
-        }
-        //$scope.transactions = transactions;
-    };
-    // Load transaction list
-    Accounts.one(account_id).getList("transactions").then($scope.addTransactions, apiErrorHandler);
+
     // Render the transaction time-chart
     Restangular.one("stats", "").get({account: account_id}).then(function (stats) {
         function parseTimeSeries(data) {
@@ -110,11 +179,13 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
         });
     }, apiErrorHandler);
     // Load categories
-    Categories.all().then(function(categories) {
+    /*$scope.categoriesPromise = Categories.all();
+    $scope.categoriesPromise.then(function(categories) {
         for (var i = 0; i < categories.length; i++) {
             $scope.categories.push(categories[i]);
+            $scope.categories_by_id[categories[i].id] = categories[i];
         }
-    });
+    });*/
     // Category filter function (used on transaction list/table)
     $scope.categoryFilter = function(transaction) {
         // No category filter
@@ -155,6 +226,10 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
             apiErrorHandler(error);
         });
     };
+});
+
+app.controller("TransactionEditCtrl", function ($scope, $routeParams, Accounts, Categories) {
+
 });
 </script>
 {% endblock %}
