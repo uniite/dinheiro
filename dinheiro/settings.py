@@ -87,7 +87,25 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
+
+# Where to store downloaded bower components
+BOWER_COMPONENTS_ROOT = site_path('components')
+
+# JavaScript libraries to install
+BOWER_INSTALLED_APPS = (
+    'angular#1.0',
+    'angular-resource#1.0',
+    'bootstrap#3.0',
+    'flot#0.8',
+    'jquery#1.10',
+    'knockout-mapping#2.4',
+    'momentjs#2.2',
+    'restangular#1.1',
+    'underscore#1.5',
+    'underscore.string#2.3',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -130,6 +148,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 
     # Third-party
+    'djangobower',
     'django_filters',
     'rest_framework',
     'south',
