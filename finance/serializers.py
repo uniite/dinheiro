@@ -32,13 +32,21 @@ class TransactionSerializer(serializers.ModelSerializer):
         return transaction.amount.quantize(Decimal("1.00"))
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ("id", "name", "parent")
-
-
 class CategoryRuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoryRule
         fields = ("id", "category", "type", "field", "content")
+
+
+class NestedRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryRule
+        fields = ("id", "type", "field", "content")
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    rules = NestedRuleSerializer(many=True)
+
+    class Meta:
+        model = Category
+        fields = ("id", "name", "parent", "rules")

@@ -1,0 +1,42 @@
+<div class="span12">
+    <h1>Edit Category</h1>
+</div>
+
+<div class="span12">
+    <form role="form" style="max-width: 30em">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" ng-model="category.name" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label for="parent">Parent</label>
+        <select class="form-control" id="parent" ng-model="category.parent" ></select>
+      </div>
+      <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+    </form>
+    <br />
+</div>
+
+<div class="span12">
+    <h3>Rules</h3>
+    <a class="btn btn-success" href="#/categories/new">New</a>
+    <table class="table">
+        <thead>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Content</th>
+            <th style="width: 5em"></th>
+        </thead>
+        <tr ng-repeat="r in category.rules">
+            <td>{{ r.field }}</td>
+            <td>{{ r.type }}</td>
+            <td>{{ r.content }}</td>
+            <td>
+                <div style="white-space: nowrap">
+                    <a class="btn btn-default" href="#/categories/{{ c.id }}/edit">Edit</a>&nbsp;
+                    <button type="button" class="btn btn-danger" ng-click="delete(c)">Delete</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

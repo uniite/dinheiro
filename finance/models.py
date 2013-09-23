@@ -283,4 +283,4 @@ class CategoryRule(models.Model):
     # Text to match against (may contain logic in the future, for new rule types)
     content = models.TextField()
     # The Category to apply if the matched
-    category = models.ForeignKey(Category)
+    category = models.ForeignKey(Category, related_name="rules")

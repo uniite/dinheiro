@@ -21,7 +21,9 @@ app.config(['$routeProvider', function($routeProvider) {
       //when('/institutions/:id', {templateUrl: '/static/partials/account-list.html',   controller: "AccountListCtrl"}).
       when('/', {templateUrl: '/static/partials/account-list.html',   controller: "AccountListCtrl"}).
       when('/accounts/:id', {templateUrl: '/static/partials/account-detail.html', controller: "AccountDetailCtrl"}).
-      when('/categories/:id/edit', {templateUrl: '/static/partials/category-edit.html', controller: "TransactionEditCtrl"}).
+      when('/categories', {templateUrl: '/static/partials/category-list.html', controller: "CategoriesListCtrl"}).
+      when('/categories/new', {templateUrl: '/static/partials/category-new.html', controller: "CategoriesEditCtrl"}).
+      when('/categories/:id/edit', {templateUrl: '/static/partials/category-edit.html', controller: "CategoriesEditCtrl"}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -33,6 +35,7 @@ app.factory("Model", function (Restangular) {
     return function (name) {
         return {
             "all": Restangular.all(name).getList,
+            "create": Restangular.all(name).post,
             "get": function (id) {
                 return Restangular.one(name, id).get();
             },
@@ -78,7 +81,7 @@ app.service("modelCache", function($rootScope, Accounts, Categories, Transaction
     return {
         loadModel: function(model) {
             initModel(model);
-            model.all().then(function (items) {
+            return model.all().then(function (items) {
                 addItems(model.name, items);
             }, apiErrorHandler);
         },
@@ -97,7 +100,7 @@ app.service("modelCache", function($rootScope, Accounts, Categories, Transaction
     }
 });
 
-app.controller("AccountListCtrl", function ($scope, modelCache) {
+app.controller("AccountListCtrl", function ($scope, Accounts, modelCache) {
     modelCache.loadModel(Accounts);
     $scope.accounts = modelCache.getCached(Accounts);
 });
@@ -107,10 +110,11 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
     $scope.sort_field = "-date";
 
     $scope.accounts = modelCache.getCached(Accounts);
-    if (!$scope.accounts) {
-        modelCache.loadModel(Accounts);
-    }
-    $scope.account = modelCache.findByID(Accounts, account_id);
+    //if (!$scope.accounts) {
+    modelCache.loadModel(Accounts).then(function() {
+        $scope.account = modelCache.findByID(Accounts, account_id);
+    })
+    //}
 
     modelCache.loadModel(Categories);
     $scope.categories = modelCache.getCached(Categories);
@@ -122,7 +126,7 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
             t.formatted_date = t.date.format("dddd, MMMM Do YYYY, HH:mm A");
             var category_id = t.category;
             t.category = function() {
-                var default_category = {name: "none"};
+                var default_category = {name: ""};
 
                 if (!$scope.categories) {
                     console.warn("FAIL");
@@ -228,8 +232,45 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
     };
 });
 
-app.controller("TransactionEditCtrl", function ($scope, $routeParams, Accounts, Categories) {
+app.controller("CategoriesListCtrl", function ($scope, $routeParams, Categories, modelCache) {
+    if (modelCache.getCached(Categories).length > 0) {
+        $scope.categories = modelCache.getCached(Categories);
+    } else {
+        modelCache.loadModel(Categories);
+        $scope.categories = modelCache.getCached(Categories);
+    }
 
+    $scope.edit = function(category) {
+    };
+});
+
+app.controller("CategoriesEditCtrl", function ($scope, $routeParams, Categories, modelCache) {
+    //var categoriesLoaded = modelCache.loadModel(Categories);
+    //$scope.categories = modelCache.getCached(Categories);
+
+    // We're either editing an existing category
+    if ($routeParams.id) {
+        $scope.category = Categories.get($routeParams.id);
+    // or a new category
+    } else {
+        $scope.category = {
+            name: "",
+            parent: null
+        };
+    }
+
+    $scope.save = function() {
+        var response;
+        // Saving an existing category
+        if ($scope.category.id) {
+        } else {
+            response = $.post("/finance/api/categories", $scope.category);
+        }
+        response.then(function() {
+            window.history.back();
+        }, apiErrorHandler);
+        // or a new category
+    };
 });
 </script>
 {% endblock %}
