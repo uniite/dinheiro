@@ -108,6 +108,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CategorySerializer
 
 
-class CategoryRuleViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryRuleViewSet(viewsets.ModelViewSet):
     queryset = models.CategoryRule.objects.all()
     serializer_class = serializers.CategoryRuleSerializer

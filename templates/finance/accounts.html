@@ -24,6 +24,8 @@ app.config(['$routeProvider', function($routeProvider) {
       when('/categories', {templateUrl: '/static/partials/category-list.html', controller: "CategoriesListCtrl"}).
       when('/categories/new', {templateUrl: '/static/partials/category-new.html', controller: "CategoriesEditCtrl"}).
       when('/categories/:id/edit', {templateUrl: '/static/partials/category-edit.html', controller: "CategoriesEditCtrl"}).
+      when('/categories/:categoryID/rules/new', {templateUrl: '/static/partials/category-rule-edit.html', controller: "RulesEditCtrl"}).
+      when('/rules/:id/edit', {templateUrl: '/static/partials/category-rule-edit.html', controller: "RulesEditCtrl"}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -52,6 +54,9 @@ app.factory("Accounts", function (Model) {
 });
 app.factory("Categories", function (Model) {
     return Model("categories")
+});
+app.factory("Rules", function (Model) {
+    return Model("rules")
 });
 app.factory("Transactions", function (Model) {
     return Model("transactions")
@@ -82,6 +87,7 @@ app.service("modelCache", function($rootScope, Accounts, Categories, Transaction
         loadModel: function(model) {
             initModel(model);
             return model.all().then(function (items) {
+                cache[model.name].splice(0);
                 addItems(model.name, items);
             }, apiErrorHandler);
         },
@@ -232,19 +238,17 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
     };
 });
 
-app.controller("CategoriesListCtrl", function ($scope, $routeParams, Categories, modelCache) {
-    if (modelCache.getCached(Categories).length > 0) {
-        $scope.categories = modelCache.getCached(Categories);
-    } else {
-        modelCache.loadModel(Categories);
-        $scope.categories = modelCache.getCached(Categories);
-    }
+app.controller("CategoriesListCtrl", function ($scope, $routeParams, $http, Categories, modelCache) {
+    modelCache.loadModel(Categories);
+    $scope.categories = modelCache.getCached(Categories);
 
-    $scope.edit = function(category) {
+    $scope.delete = function(category) {
+        $http.delete("/finance/api/categories/" + category.id);
+        $scope.categories.splice($scope.categories.indexOf(category.id), 1);
     };
 });
 
-app.controller("CategoriesEditCtrl", function ($scope, $routeParams, Categories, modelCache) {
+app.controller("CategoriesEditCtrl", function ($scope, $routeParams, Categories, modelCache, $http) {
     //var categoriesLoaded = modelCache.loadModel(Categories);
     //$scope.categories = modelCache.getCached(Categories);
 
@@ -255,21 +259,85 @@ app.controller("CategoriesEditCtrl", function ($scope, $routeParams, Categories,
     } else {
         $scope.category = {
             name: "",
-            parent: null
+            parent: null,
+            rules: []
         };
+    }
+
+    $scope.deleteRule = function(rule) {
+        $http.delete("/finance/api/rules/" + rule.id);
     }
 
     $scope.save = function() {
         var response;
         // Saving an existing category
         if ($scope.category.id) {
+        // or a new category
         } else {
-            response = $.post("/finance/api/categories", $scope.category);
+            response = $http.post("/finance/api/categories", $scope.category);
         }
         response.then(function() {
             window.history.back();
         }, apiErrorHandler);
-        // or a new category
+    };
+});
+
+app.controller("RulesEditCtrl", function ($scope, $routeParams, Rules, modelCache, $http) {
+    $scope.fields = [
+        {name: "Date", value: "date"},
+        {name: "Payee", value: "payee"},
+        {name: "Type", value: "type"}
+    ];
+    $scope.types = [
+        {name: "Contains", value: "contains"},
+        {name: "Starts With", value: "startswith"},
+        {name: "Ends With", value: "endswith"}
+    ];
+
+    var loadCategory = function() {
+       $http.get("/finance/api/categories/" + $scope.rule.category).then(function(response) {
+            $scope.category = response.data;
+        });
+    }
+
+    // We're either editing an existing rule
+    if ($routeParams.id) {
+        $scope.title = "Edit Rule";
+        $http.get("/finance/api/rules/" + $routeParams.id).then(function(response) {
+            var rule = response.data;
+            rule.field = $scope.fields.filter(function(f) {
+                return f.value == rule.field;
+            })[0];
+            rule.type = $scope.types.filter(function(t) {
+                return t.value == rule.type;
+            })[0];
+            $scope.rule = rule;
+            loadCategory();
+        });
+    // or a new rule
+    } else if ($routeParams.categoryID) {
+        $scope.title = "New Rule";
+        $scope.rule = {
+            category: $routeParams.categoryID,
+            type: "",
+            field: null,
+            content: ""
+        };
+        loadCategory();
+    }
+
+    $scope.save = function() {
+        var response;
+        // Saving an existing rule
+        if ($scope.rule.id) {
+            response = $http.put("/finance/api/rules/" + $scope.rule.id, $scope.rule);
+        // or a new rule
+        } else {
+            response = $http.post("/finance/api/rules", $scope.rule);
+        }
+        response.then(function() {
+            window.history.back();
+        }, apiErrorHandler);
     };
 });
 </script>

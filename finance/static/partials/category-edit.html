@@ -19,7 +19,7 @@
 
 <div class="span12">
     <h3>Rules</h3>
-    <a class="btn btn-success" href="#/categories/new">New</a>
+    <a class="btn btn-success" href="#/categories/{{ category.id }}/rules/new">New</a>
     <table class="table">
         <thead>
             <th>Field</th>
@@ -33,7 +33,7 @@
             <td>{{ r.content }}</td>
             <td>
                 <div style="white-space: nowrap">
-                    <a class="btn btn-default" href="#/categories/{{ c.id }}/edit">Edit</a>&nbsp;
+                    <a class="btn btn-default" href="#/rules/{{ r.id }}/edit">Edit</a>&nbsp;
                     <button type="button" class="btn btn-danger" ng-click="delete(c)">Delete</button>
                 </div>
             </td>
