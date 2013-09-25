@@ -241,20 +241,25 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
 app.controller("CategoriesListCtrl", function ($scope, $routeParams, $http, Categories, modelCache) {
     modelCache.loadModel(Categories);
     $scope.categories = modelCache.getCached(Categories);
+    $http.get("/finance/api/categories").then(function(response) {
+        $scope.categories = response.data;
+    });
 
     $scope.delete = function(category) {
         $http.delete("/finance/api/categories/" + category.id);
-        $scope.categories.splice($scope.categories.indexOf(category.id), 1);
+        $scope.categories.splice($scope.categories.indexOf(category), 1);
     };
 });
 
-app.controller("CategoriesEditCtrl", function ($scope, $routeParams, Categories, modelCache, $http) {
+app.controller("CategoriesEditCtrl", function ($scope, $routeParams, $http, Categories, modelCache) {
     //var categoriesLoaded = modelCache.loadModel(Categories);
     //$scope.categories = modelCache.getCached(Categories);
 
     // We're either editing an existing category
     if ($routeParams.id) {
-        $scope.category = Categories.get($routeParams.id);
+        $http.get("/finance/api/categories/" + $routeParams.id).then(function(response) {
+            $scope.category = response.data;
+        });
     // or a new category
     } else {
         $scope.category = {
@@ -266,6 +271,7 @@ app.controller("CategoriesEditCtrl", function ($scope, $routeParams, Categories,
 
     $scope.deleteRule = function(rule) {
         $http.delete("/finance/api/rules/" + rule.id);
+        $scope.category.rules.splice($scope.category.rules.indexOf(rule), 1);
     }
 
     $scope.save = function() {
