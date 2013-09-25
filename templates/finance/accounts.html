@@ -111,7 +111,7 @@ app.controller("AccountListCtrl", function ($scope, Accounts, modelCache) {
     $scope.accounts = modelCache.getCached(Accounts);
 });
 
-app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular, Accounts, Categories, Transactions, modelCache) {
+app.controller("AccountDetailCtrl", function ($scope, $routeParams, $http, Restangular, Accounts, Categories, Transactions, modelCache) {
     var account_id = $routeParams.id;
     $scope.sort_field = "-date";
 
@@ -126,16 +126,16 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
     $scope.categories = modelCache.getCached(Categories);
 
     // Transaction loading
-    Accounts.one(account_id).getList("transactions").then(function(transactions) {
+    $http.get(_.string.sprintf("/finance/api/accounts/%s/transactions", account_id)).then(function(response) {
+        var transactions = response.data;
         modelCache.loadCustom(Transactions, transactions.map(function(t) {
-            t.date = moment(t.date);
-            t.formatted_date = t.date.format("dddd, MMMM Do YYYY, HH:mm A");
+            t.date = new Date(t.date);
+            t.formatted_date = t.date.toLocaleDateString();
             var category_id = t.category;
             t.category = function() {
                 var default_category = {name: ""};
 
                 if (!$scope.categories) {
-                    console.warn("FAIL");
                     return default_category;
                 }
 
@@ -143,11 +143,9 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
                     return c.id == category_id;
                 });
 
-
                 if (matches.length == 0)
                     return default_category;
 
-                console.log(matches[0]);
                 return matches[0];
             }
             return t;
@@ -158,7 +156,8 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
     $scope.category = null;
 
     // Render the transaction time-chart
-    Restangular.one("stats", "").get({account: account_id}).then(function (stats) {
+    $http.get("/finance/api/stats", {account: account_id}).then(function (response) {
+        var stats = response.data;
         function parseTimeSeries(data) {
             return data.map(function(point) {
                 return [
@@ -188,14 +187,7 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, Restangular,
             }
         });
     }, apiErrorHandler);
-    // Load categories
-    /*$scope.categoriesPromise = Categories.all();
-    $scope.categoriesPromise.then(function(categories) {
-        for (var i = 0; i < categories.length; i++) {
-            $scope.categories.push(categories[i]);
-            $scope.categories_by_id[categories[i].id] = categories[i];
-        }
-    });*/
+
     // Category filter function (used on transaction list/table)
     $scope.categoryFilter = function(transaction) {
         // No category filter

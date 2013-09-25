@@ -28,15 +28,15 @@
         <thead>
             <th>Date</th>
             <th>Payee</th>
-            <th>Type</th>
-            <th>Category</th>
+            <th class="hidden-xs hidden-sm">Type</th>
+            <th class="hidden-xs">Category</th>
             <th>Amount</th>
         </thead>
         <tr ng-repeat="t in transactions | filter:search_text | filter:categoryFilter | orderBy:sort_field">
             <td>{{ t.formatted_date }}</td>
             <td>{{ t.payee }}</td>
-            <td>{{ t.type }}</td>
-            <td>{{ t.category().name }}</td>
+            <td class="hidden-xs hidden-sm">{{ t.type }}</td>
+            <td class="hidden-xs">{{ t.category().name }}</td>
             <td style="text-align: right;">{{ t.amount }}</td>
         </tr>
     </table>
