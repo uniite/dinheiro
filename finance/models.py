@@ -124,7 +124,6 @@ class Institution(models.Model):
 
             # Sync this statement's transactions with our local records
             for ofx_transaction in statement.transactions:
-                print ofx_transaction
                 # Skip the transaction if we already have it
                 # TODO: I have no idea if transactions IDs are enforced by the spec
                 if local_account.transaction_set.filter(transaction_id=ofx_transaction.id).exists():
