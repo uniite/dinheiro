@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.core import validators
 from django.utils import timezone
+from django.dispatch import receiver
 
 import ofxclient
 from ofxclient.client import Client
@@ -123,6 +124,7 @@ class Institution(models.Model):
 
             # Sync this statement's transactions with our local records
             for ofx_transaction in statement.transactions:
+                print ofx_transaction
                 # Skip the transaction if we already have it
                 # TODO: I have no idea if transactions IDs are enforced by the spec
                 if local_account.transaction_set.filter(transaction_id=ofx_transaction.id).exists():
@@ -137,11 +139,18 @@ class Institution(models.Model):
                 # Copy over some attributes that map 1:1 with our local Transaction model
                 for attr in ("date", "payee", "mcc", "memo", "sic", "type"):
                     setattr(local_transaction, attr, getattr(ofx_transaction, attr))
+                    # Fix up some escaped characters
+                    local_transaction.payee = local_transaction.payee.replace("&amp;", "&")
                 # Validate and save
                 local_transaction.full_clean()
                 # TODO: Make it validate transaction_id uniqueness down here (less work for the DB)
                 local_transaction.save()
                 new_transactions.append(local_transaction)
+
+        # Categorize all the new transactions
+        # TOOD: Do it on these instead of on all
+        for c in Category.objects.all():
+            c.apply()
 
         return new_transactions
 
@@ -253,12 +262,25 @@ class Category(models.Model):
         """ Find all Transactions that match this category. """
         # Construct a query based on our rules
         query = Transaction.objects
-        for rule in self.categoryrule_set.all():
+        # This will become a bunch of models.Q instances OR'd together
+        conditions = None
+        for rule in self.rules.all():
             # These are easy and efficient, because they map directly to Django ORM filters
             if rule.type in ("contains", "startswith", "endswith"):
+                # Becomes Q(payee__contains="the coffee shop")
                 filter_field = "%s__%s" % (rule.field, rule.type)
-                query = query.filter(**{filter_field: rule.content})
-        return query
+                filter = models.Q(**{filter_field: rule.content})
+                # It is either the first condition
+                if conditions is None:
+                    conditions = filter
+                # or a subsequent condition (OR'd with the rest)
+                else:
+                    conditions |= filter
+        # If we don't have any rules/conditions, return no matches
+        if conditions is None:
+            return []
+        else:
+            return query.filter(conditions)
 
 
 
@@ -284,3 +306,11 @@ class CategoryRule(models.Model):
     content = models.TextField()
     # The Category to apply if the matched
     category = models.ForeignKey(Category, related_name="rules")
+
+    def clean(self):
+        self.content = self.content.lower().strip()
+
+
+@receiver(models.signals.post_save, sender=CategoryRule)
+def apply_rules(sender, instance, **kwargs):
+    instance.category.apply()

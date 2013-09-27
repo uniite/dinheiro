@@ -20,6 +20,7 @@
             <td>{{ c.parent }}</td>
             <td>
                 <div style="white-space: nowrap">
+                    <a class="btn btn-default" href="#/categories/{{ c.id }}/rules/new">New Rule</a>&nbsp;
                     <a class="btn btn-default" href="#/categories/{{ c.id }}/edit">Edit</a>&nbsp;
                     <button type="button" class="btn btn-danger" ng-click="delete(c)">Delete</button>
                 </div>

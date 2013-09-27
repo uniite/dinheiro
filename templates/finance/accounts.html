@@ -20,7 +20,7 @@ app.config(['$routeProvider', function($routeProvider) {
       //when('/institutions', {templateUrl: '/static/partials/account-list.html',   controller: "InstitutionListCtrl"}).
       //when('/institutions/:id', {templateUrl: '/static/partials/account-list.html',   controller: "AccountListCtrl"}).
       when('/', {templateUrl: '/static/partials/account-list.html',   controller: "AccountListCtrl"}).
-      when('/accounts/:id', {templateUrl: '/static/partials/account-detail.html', controller: "AccountDetailCtrl"}).
+      when('/accounts/:id', {templateUrl: '/static/partials/account-detail.html', controller: "AccountDetailCtrl", reloadOnSearch: false}).
       when('/categories', {templateUrl: '/static/partials/category-list.html', controller: "CategoriesListCtrl"}).
       when('/categories/new', {templateUrl: '/static/partials/category-new.html', controller: "CategoriesEditCtrl"}).
       when('/categories/:id/edit', {templateUrl: '/static/partials/category-edit.html', controller: "CategoriesEditCtrl"}).
@@ -111,7 +111,7 @@ app.controller("AccountListCtrl", function ($scope, Accounts, modelCache) {
     $scope.accounts = modelCache.getCached(Accounts);
 });
 
-app.controller("AccountDetailCtrl", function ($scope, $routeParams, $http, Restangular, Accounts, Categories, Transactions, modelCache) {
+app.controller("AccountDetailCtrl", function ($scope, $routeParams, $location,  $http, Restangular, Accounts, Categories, Transactions, modelCache) {
     var account_id = $routeParams.id;
     $scope.sort_field = "-date";
 
@@ -122,18 +122,13 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, $http, Resta
     })
     //}
 
-    modelCache.loadModel(Categories);
-    $scope.categories = modelCache.getCached(Categories);
-
-    // Transaction loading
-    $http.get(_.string.sprintf("/finance/api/accounts/%s/transactions", account_id)).then(function(response) {
-        var transactions = response.data;
+    var addTransactions = function(transactions) {
         modelCache.loadCustom(Transactions, transactions.map(function(t) {
             t.date = new Date(t.date);
             t.formatted_date = t.date.toLocaleDateString();
             var category_id = t.category;
             t.category = function() {
-                var default_category = {name: ""};
+                var default_category = {id: 0, name: ""};
 
                 if (!$scope.categories) {
                     return default_category;
@@ -150,6 +145,37 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, $http, Resta
             }
             return t;
         }));
+    };
+
+    //modelCache.loadModel(Categories);
+    $scope.categories = [];
+    $http.get("/finance/api/categories").then(function(response) {
+        $scope.categories = response.data;
+        $scope.categories.unshift({id: 0, name: "(uncategorized)"});
+        var categoryParam = $location.search().category;
+        if (categoryParam) {
+            var matches = $scope.categories.filter(function(c) {
+                return c.name == categoryParam;
+            });
+            if (matches) {
+                $scope.category = matches[0];
+            }
+        }
+    });
+
+    $scope.$watch('category', function(category) {
+        console.log($scope.category);
+        if (category) {
+            $location.search({category: category.name});
+        } else {
+            $location.search({});
+        }
+    });
+
+    // Transaction loading
+    $http.get(_.string.sprintf("/finance/api/accounts/%s/transactions", account_id)).then(function(response) {
+        var transactions = response.data;
+        addTransactions(transactions);
     }, apiErrorHandler);
     $scope.transactions = modelCache.getCached(Transactions);
 
@@ -190,12 +216,12 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, $http, Resta
 
     // Category filter function (used on transaction list/table)
     $scope.categoryFilter = function(transaction) {
-        // No category filter
-        if ($scope.category === null) {
+        // All categories (unfiltered)
+        if ($scope.category == null) {
             return true;
         // Must match selected category
         } else {
-            return transaction.category == $scope.category.id;
+            return transaction.category().id === $scope.category.id;
         }
     }
     // Cleans off the garbage Restangular adds to our responses
@@ -212,16 +238,16 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, $http, Resta
         if (!$scope.account) return;
         // Disable the button while the sync runs
         var button = $(event.target)
-        button.addClass("disabled").text("Syncing...");
+        button.button("loading");
         var enableButton = function() {
-            button.removeClass("disabled").text("Sync");
+            button.button("reset");
         };
         $scope.account.post("sync").then(function(update) {
             //new_transactions = $scope.cleanResponse(new_transactions);
             // This seems to be a fast way to extend the array (source: http://jsperf.com/angulararrays)
             //$scope.transactions = $scope.transactions.concat(new_transactions);
             $scope.account.balance = update.balance;
-            $scope.addTransactions(update.transactions);
+            addTransactions(update.transactions);
             enableButton();
         }, function(error) {
             enableButton();
@@ -302,14 +328,7 @@ app.controller("RulesEditCtrl", function ($scope, $routeParams, Rules, modelCach
     if ($routeParams.id) {
         $scope.title = "Edit Rule";
         $http.get("/finance/api/rules/" + $routeParams.id).then(function(response) {
-            var rule = response.data;
-            rule.field = $scope.fields.filter(function(f) {
-                return f.value == rule.field;
-            })[0];
-            rule.type = $scope.types.filter(function(t) {
-                return t.value == rule.type;
-            })[0];
-            $scope.rule = rule;
+            $scope.rule  = response.data;
             loadCategory();
         });
     // or a new rule
@@ -317,8 +336,8 @@ app.controller("RulesEditCtrl", function ($scope, $routeParams, Rules, modelCach
         $scope.title = "New Rule";
         $scope.rule = {
             category: $routeParams.categoryID,
-            type: "",
-            field: null,
+            type: "startswith",
+            field: "payee",
             content: ""
         };
         loadCategory();
