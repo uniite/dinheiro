@@ -25,7 +25,10 @@
         <script type="text/javascript" src="{% static 'underscore/underscore.js' %}"></script>
         <script type="text/javascript" src="{% static 'underscore.string/lib/underscore.string.js' %}"></script>
         <script type="text/javascript" src="{% static 'angular/angular.js' %}"></script>
+        <script type="text/javascript" src="{% static 'angular-route/angular-route.js' %}"></script>
         <script type="text/javascript" src="{% static 'angular-resource/angular-resource.js' %}"></script>
+        <script type="text/javascript" src="{% static 'angular-strap/dist/angular-strap.js' %}"></script>
+        <script type="text/javascript" src="{% static 'angular-strap/dist/angular-strap.tpl.js' %}"></script>
         <script type="text/javascript" src="{% static 'restangular/dist/restangular.js' %}"></script>
         <script type="text/javascript" src="{% static 'flot/jquery.flot.js' %}"></script>
         <script type="text/javascript" src="{% static 'flot/jquery.flot.threshold.js' %}"></script>
@@ -45,7 +48,7 @@
     <body>
         {% block navbar %}
         <div class="{% block navbar-classes %}navbar navbar-inverse navbar-fixed-top{% endblock %}">
-            <div class="container">
+            <div class="container" bs-navbar>
                 <div class="navbar-header">
                   <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
@@ -56,9 +59,9 @@
                 </div>
                 <div class="collapse navbar-collapse">
                   <ul class="nav navbar-nav">
-                    <li class="active"><a href="{% url "inst-index" %}">Home</a></li>
-                    <li id="accounts-tab"><a href="{% url "accounts" %}">Accounts</a></li>
-                    <li id="accounts-tab"><a href="{% url "accounts" %}#/categories">Categories</a></li>
+                    <li id="home-tab" data-match-route="^/home"><a href="{% url "inst-index" %}">Home</a></li>
+                    <li id="accounts-tab" data-match-route="^/"><a href="{% url "accounts" %}">Accounts</a></li>
+                    <li id="categories-tab" data-match-route="^/categories"><a href="{% url "accounts" %}#/categories">Categories</a></li>
                     <li><a href="{% url "inst-search" %}">Search</a></li>
                     <li><a href="{% url "transactions-list" %}">Transactions</a></li>
                   </ul>

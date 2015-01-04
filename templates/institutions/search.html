@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Search Institutions</h2>
+    <form action="{% url "inst-search-results" %}" method="POST">
+        {% csrf_token %}
+        <input type="text" name="q" />
+        <br />
+        <br />
+        <input class="btn" type="submit" />
+    </form>
+{% endblock %}

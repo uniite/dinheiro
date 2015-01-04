@@ -26,7 +26,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ("id", "amount", "date", "payee", "type", "category")
+        fields = ("id", "amount", "date", "payee", "type", "category", "account", "transaction_id")
 
     def get_amount(self, transaction):
         return transaction.amount.quantize(Decimal("1.00"))

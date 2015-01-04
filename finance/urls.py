@@ -32,5 +32,6 @@ urlpatterns = patterns('',
         url(r'^institutions/(\d+)/?$', 'finance.views.show', name='inst-show'),
         url(r'^institutions/add/(\d+)?$', 'finance.views.add', name='inst-add'),
         url(r'^institutions/search/?$', 'finance.views.search', name='inst-search'),
+        url(r'^institutions/search_results/?$', 'finance.views.search_results', name='inst-search-results'),
         url(r'^transactions/?$', TransactionListView.as_view(), name='transactions-list'),
 )

@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
     <form action="{% url "inst-add" %}" method="POST">
         {% csrf_token %}
-        {{ inst_form }}
+        {{ inst_form|crispy }}
         <br />
         <input class="btn" type="submit" />
     </form>

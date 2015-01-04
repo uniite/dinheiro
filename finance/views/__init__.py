@@ -14,7 +14,7 @@ def add(request, id):
     inst = Institution()
     if request.method == "GET":
         if id:
-            info = OFXHome.lookup(id)
+            info = OFXHome.lookup(int(id))
             inst.name = info.name
             inst.fid = info.fid
             inst.org = info.org
@@ -37,11 +37,14 @@ def index(request):
     return render(request, "institutions/index.html", {"institutions": Institution.objects.all()})
 
 def search(request):
-    if "q" in request.GET:
-        results = OFXHome.search(request.GET["q"])
+     return render(request, "institutions/search.html")
+
+def search_results(request):
+    if "q" in request.POST:
+        results = OFXHome.search(request.POST["q"])
     else:
         results = []
-    return render(request, "institutions/search.html", {"results": results})
+    return render(request, "institutions/search_results.html", {"results": results})
 
 def show(request, pk):
     inst = get_object_or_404(Institution, pk=pk)

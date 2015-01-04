@@ -19,12 +19,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'db.sqlite3',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'dinheiro',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': '',
+        'USER': 'root',
         'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'HOST': os.environ['BOXEN_MYSQL_SOCKET'],  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
 }
@@ -96,14 +96,16 @@ BOWER_COMPONENTS_ROOT = site_path('components')
 
 # JavaScript libraries to install
 BOWER_INSTALLED_APPS = (
-    'angular#1.0',
-    'angular-resource#1.0',
-    'bootstrap#3.0',
+    'angular#^1.3',
+    'angular-resource#^1.3',
+    'angular-route#^1.3',
+    'angular-strap#^2.1',
+    'bootstrap#^3.0',
     'flot#0.8',
     'jquery#1.10',
     'knockout-mapping#2.4',
     'momentjs#2.2',
-    'restangular#1.1',
+    'restangular#^1.1',
     'underscore#1.5',
     'underscore.string#2.3',
 )
@@ -148,6 +150,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 
     # Third-party
+    'crispy_forms',
     'djangobower',
     'django_filters',
     'rest_framework',
@@ -185,3 +188,6 @@ LOGGING = {
         },
     }
 }
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'

@@ -1,4 +1,5 @@
 import datetime
+from collections import defaultdict
 from decimal import Decimal
 from StringIO import StringIO
 
@@ -101,6 +102,7 @@ class Institution(models.Model):
             # If we don't have a copy of the account locally, create it
             # TODO: Detect accounts with changed account numbers (eg. a re-issued credit card)
             local_account, created = self.account_set.get_or_create(account_number=ofx_account.number)
+            local_account.name = self.name
             # Try to figure out how far back to sync
             if local_account.transaction_set.exists():
                 # We already have some Transactions; sync up through the day before the newest Transaction
@@ -116,7 +118,8 @@ class Institution(models.Model):
             # Sync this Account by downloading an account statement
             # TODO: Determine what amount of days is a good default
             statement = ofx_account.statement(days=sync_days)
-            local_account.available_balance = statement.available_balance
+            if hasattr(statement, "available_balance"):
+                local_account.available_balance = statement.available_balance
             local_account.balance = statement.balance
             # Validate and save (TODO: do the whole sync as a database transaction?)
             local_account.full_clean()
@@ -168,7 +171,7 @@ class Account(models.Model):
     # and they might contain letters in special cases (in which case we can just change the validator)
     account_number = models.CharField(max_length=50, validators=[number_validator])
     # User-defined name for the account, to identify it (since we don't want to toss around the account number)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, blank=True)
 
     ## Optional fields
     # Same goes for routing number (although I'm not sure about the length)
@@ -193,6 +196,36 @@ class Account(models.Model):
         (which syncs all the institution's accounts)
         """
         return self.institution.sync()
+
+    def find_recurring_transactions(self):
+        trx = Transaction.objects.filter(account=self)
+        # First, build the dict index
+        # Structure: {'2014-03': {'Payee': 4, ...}, ...}
+        monthly_payee_trx = defaultdict(lambda: defaultdict(list))
+        for t in trx:
+            monthly_payee_trx[t.date.strftime('%Y-%m')][t.payee].append(t)
+        # Then, filter out payees that show up only once a month, and put them in a flattened data structure
+        # Structure: {'Payee': [Transaction, ...]}
+        recurring_trx = defaultdict(list)
+        for month, payee_trx in monthly_payee_trx.iteritems():
+            for payee,trx in payee_trx.iteritems():
+                if len(trx) == 1:
+                    recurring_trx[payee] += trx
+        # Finally, filter out transactions that don't happen around the same time each month
+        # Note: we use keys instead of iteritems, so we can delete payees in-place
+        for payee in recurring_trx.keys():
+            # Toss out payees with only one transaction total
+            if len(recurring_trx[payee]) == 1:
+                recurring_trx.pop(payee)
+                continue
+            # Get the first date, and ensure every transaction is close to it (+/- 2 days)
+            base_date = recurring_trx[payee][0].date
+            if not all([abs(base_date.day - t.date.day) <= 2 for t in recurring_trx[payee]]):
+                recurring_trx.pop(payee)
+            else:
+                print "%s, %s" % (payee, len(recurring_trx[payee]))
+
+        return recurring_trx
 
 
 four_digit_validators = [validators.MinValueValidator(0), validators.MaxValueValidator(4)]
