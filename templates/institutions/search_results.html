@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if results %}
+        {% for inst in results %}
+            <a href="{% url "inst-add" inst.id %}">{{ inst.id }} - {{ inst.name }}</a><br />
+        {% endfor %}
+    {% else %}
+        No Matches Found
+    {% endif %}
+{% endblock %}
