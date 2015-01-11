@@ -314,6 +314,8 @@ class Category(models.Model):
         else:
             return query.filter(conditions)
 
+    def __unicode__(self):
+        return self.name
 
 
 class CategoryRule(models.Model):
@@ -340,7 +342,12 @@ class CategoryRule(models.Model):
     category = models.ForeignKey(Category, related_name="rules")
 
     def clean(self):
-        self.content = self.content.lower().strip()
+        self.content = self.content.strip()
+
+
+@receiver(models.signals.post_save, sender=Institution)
+def apply_rules(sender, instance, **kwargs):
+    instance.sync()
 
 
 @receiver(models.signals.post_save, sender=CategoryRule)
