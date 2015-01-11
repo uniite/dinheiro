@@ -135,7 +135,7 @@ ROOT_URLCONF = 'dinheiro.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'dinheiro.wsgi.application'
 
-TEMPLATE_DIRS = site_path('templates')
+TEMPLATE_DIRS = (site_path('templates'),)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -154,7 +154,6 @@ INSTALLED_APPS = (
     'djangobower',
     'django_filters',
     'rest_framework',
-    'south',
 
     # First-party
     'finance',
@@ -188,6 +187,9 @@ LOGGING = {
         },
     }
 }
+
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'

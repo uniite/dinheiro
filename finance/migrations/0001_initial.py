@@ -1,102 +1,110 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+from django.conf import settings
+import django.core.validators
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Institution'
-        db.create_table(u'finance_institution', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('fid', self.gf('django.db.models.fields.IntegerField')()),
-            ('org', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('url', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('username', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('password', self.gf('django.db.models.fields.CharField')(max_length=128)),
-        ))
-        db.send_create_signal(u'finance', ['Institution'])
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding unique constraint on 'Institution', fields ['fid', 'username']
-        db.create_unique(u'finance_institution', ['fid', 'username'])
-
-        # Adding model 'Account'
-        db.create_table(u'finance_account', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('institution', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['finance.Institution'])),
-            ('account_number', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('routing_number', self.gf('django.db.models.fields.CharField')(max_length=9, blank=True)),
-            ('balance', self.gf('django.db.models.fields.DecimalField')(max_digits=15, decimal_places=2)),
-            ('broker_id', self.gf('django.db.models.fields.CharField')(max_length=50)),
-        ))
-        db.send_create_signal(u'finance', ['Account'])
-
-        # Adding model 'Transaction'
-        db.create_table(u'finance_transaction', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['finance.Account'])),
-            ('amount', self.gf('django.db.models.fields.DecimalField')(max_digits=15, decimal_places=2)),
-            ('currency', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('mcc', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('memo', self.gf('django.db.models.fields.TextField')()),
-            ('payee', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('sic', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('transaction_id', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=50)),
-        ))
-        db.send_create_signal(u'finance', ['Transaction'])
-
-
-    def backwards(self, orm):
-        # Removing unique constraint on 'Institution', fields ['fid', 'username']
-        db.delete_unique(u'finance_institution', ['fid', 'username'])
-
-        # Deleting model 'Institution'
-        db.delete_table(u'finance_institution')
-
-        # Deleting model 'Account'
-        db.delete_table(u'finance_account')
-
-        # Deleting model 'Transaction'
-        db.delete_table(u'finance_transaction')
-
-
-    models = {
-        u'finance.account': {
-            'Meta': {'object_name': 'Account'},
-            'account_number': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'balance': ('django.db.models.fields.DecimalField', [], {'max_digits': '15', 'decimal_places': '2'}),
-            'broker_id': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'institution': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['finance.Institution']"}),
-            'routing_number': ('django.db.models.fields.CharField', [], {'max_length': '9', 'blank': 'True'})
-        },
-        u'finance.institution': {
-            'Meta': {'unique_together': "(('fid', 'username'),)", 'object_name': 'Institution'},
-            'fid': ('django.db.models.fields.IntegerField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'org': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'url': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'username': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'finance.transaction': {
-            'Meta': {'object_name': 'Transaction'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['finance.Account']"}),
-            'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '15', 'decimal_places': '2'}),
-            'currency': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'date': ('django.db.models.fields.DateTimeField', [], {}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'mcc': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'memo': ('django.db.models.fields.TextField', [], {}),
-            'payee': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'sic': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'transaction_id': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        }
-    }
-
-    complete_apps = ['finance']
+    operations = [
+        migrations.CreateModel(
+            name='Account',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('account_number', models.CharField(max_length=50, validators=[django.core.validators.RegexValidator(b'^\\d+$', b'Must be a number')])),
+                ('name', models.CharField(max_length=50, blank=True)),
+                ('routing_number', models.CharField(blank=True, max_length=9, validators=[django.core.validators.RegexValidator(b'^\\d+$', b'Must be a number')])),
+                ('balance', models.DecimalField(default=0, max_digits=15, decimal_places=2)),
+                ('broker_id', models.CharField(max_length=50, blank=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Category',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=50)),
+                ('parent', models.ForeignKey(blank=True, to='finance.Category', null=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='CategoryRule',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('type', models.CharField(default=b'contains', max_length=10, choices=[(b'contains', b'Contains'), (b'startswith', b'Starts With'), (b'endswith', b'Ends With')])),
+                ('field', models.CharField(default=b'payee', max_length=20, choices=[(b'date', b'Date'), (b'payee', b'Payee'), (b'type', b'Type')])),
+                ('content', models.TextField()),
+                ('category', models.ForeignKey(related_name='rules', to='finance.Category')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Institution',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('fid', models.IntegerField()),
+                ('org', models.CharField(max_length=50)),
+                ('url', models.CharField(max_length=255)),
+                ('username', models.CharField(max_length=50)),
+                ('password', models.CharField(max_length=128)),
+                ('name', models.CharField(default=b'Unknown', max_length=255)),
+                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Transaction',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('amount', models.DecimalField(max_digits=15, decimal_places=2)),
+                ('currency', models.CharField(max_length=3, validators=[django.core.validators.RegexValidator(b'^[a-zA-Z]+$')])),
+                ('date', models.DateTimeField()),
+                ('payee', models.CharField(max_length=255)),
+                ('transaction_id', models.CharField(max_length=255)),
+                ('mcc', models.IntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(4)])),
+                ('memo', models.TextField(blank=True)),
+                ('sic', models.IntegerField(blank=True, null=True, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(4)])),
+                ('type', models.CharField(max_length=50, blank=True)),
+                ('account', models.ForeignKey(to='finance.Account')),
+                ('category', models.ForeignKey(blank=True, to='finance.Category', null=True)),
+            ],
+            options={
+                'ordering': ['-date'],
+                'get_latest_by': 'date',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AlterUniqueTogether(
+            name='transaction',
+            unique_together=set([('account', 'transaction_id')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='institution',
+            unique_together=set([('fid', 'username')]),
+        ),
+        migrations.AddField(
+            model_name='account',
+            name='institution',
+            field=models.ForeignKey(to='finance.Institution'),
+            preserve_default=True,
+        ),
+        migrations.AlterUniqueTogether(
+            name='account',
+            unique_together=set([('institution', 'account_number')]),
+        ),
+    ]
