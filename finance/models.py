@@ -1,4 +1,6 @@
+import binascii
 import datetime
+import json
 from collections import defaultdict
 from decimal import Decimal
 from StringIO import StringIO
@@ -13,6 +15,8 @@ import ofxclient
 from ofxclient.client import Client
 from ofxparse import OfxParser
 from BeautifulSoup import BeautifulStoneSoup
+
+import backend_api
 
 
 
@@ -60,25 +64,23 @@ class Institution(models.Model):
     """
 
     owner = models.ForeignKey(User)
-    # Financial institution ID?
-    fid = models.IntegerField()
-    # Some sort of OFX organization ID
-    org = models.CharField(max_length=50)
-    # OFX API endpoint
-    url = models.CharField(max_length=255)
-    # Credentials (careful, these are the user's online banking credentials)
-    username = models.CharField(max_length=50)
-    password = models.CharField(max_length=128)
+    # Contains an encrypted collection of the OFX parameters and credentials,
+    # which is consumed by the backend (see sync() and finance.backend_api)
+    ofx_token = models.TextField()
     # The name of the institution (from OFXHome or user-defined)
     name = models.CharField(max_length=255, default="Unknown")
 
     class Meta:
-        unique_together = ("fid", "username")
+        unique_together = ("owner", "name")
 
     def clean(self):
         self.name = self.name.strip()
         self.org = self.org.strip()
         self.url = self.url.strip()
+
+    def set_ofx_token(self, fid, org, url, username, password):
+        token = json.dumps({'fid': fid, 'org': org, 'url': url, 'username': username, 'password': password})
+        self.ofx_token = backend_api.Client().execute('encrypt', token)['response']
 
     def sync(self):
         """
@@ -169,7 +171,9 @@ class Account(models.Model):
     # Account numbers are not integers, because they can be of arbitrary length,
     # they aren't normally used in mathematical operations (except checksums),
     # and they might contain letters in special cases (in which case we can just change the validator)
-    account_number = models.CharField(max_length=50, validators=[number_validator])
+    number = models.CharField(max_length=4, validators=[number_validator])
+    # This is a cryptographic hash of the full account number, which we don't have (we only keep the last four digits)
+    backend_id = models.CharField(max_length=255)
     # User-defined name for the account, to identify it (since we don't want to toss around the account number)
     name = models.CharField(max_length=50, blank=True)
 
@@ -182,9 +186,10 @@ class Account(models.Model):
     broker_id = models.CharField(blank=True, max_length=50)
 
     class Meta:
-        unique_together = ("institution", "account_number")
+        unique_together = ("institution", "backend_id")
 
     def censored_account_number(self):
+        return "*%s" % self.number
         """ The account number with all but the last four (or less) digits censored. """
         # (eg. "1234" => "***4", "12345678910" => "*******8910")
         show_digits = max(4, len(self.account_number) // 2.5)
@@ -195,7 +200,33 @@ class Account(models.Model):
         TODO: Currently it is just an alias for institution.sync
         (which syncs all the institution's accounts)
         """
-        return self.institution.sync()
+
+        # The backend will get us the transactions we need, based on the institution's credentials,
+        account_id = self.backend_id
+        statement = backend_api.Client().execute('get_statement', self.institution.ofx_token, account_id)['response']
+        # First, update the account fields based on the statement
+        self.balance = statement['balance']
+        # Then, sync our transactions with the list in the statement
+        new_transactions = []
+        for ofx_transaction in statement['transactions']:
+            # Skip the transaction if we already have it
+            # TODO: I have no idea if transactions IDs are enforced by the spec
+            if self.transaction_set.filter(transaction_id=ofx_transaction['transaction_id']).exists():
+                continue
+            local_transaction = Transaction(**ofx_transaction)
+            local_transaction.account = self
+            # Validate and save
+            local_transaction.full_clean()
+            # TODO: Make it validate transaction_id uniqueness down here (less work for the DB)
+            local_transaction.save()
+            new_transactions.append(local_transaction)
+
+        # Categorize all the new transactions
+        # TOOD: Do it on just he new transactions instead of on all
+        for c in Category.objects.all():
+            c.apply()
+
+        return new_transactions
 
     def find_recurring_transactions(self):
         trx = Transaction.objects.filter(account=self)

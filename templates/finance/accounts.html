@@ -77,6 +77,11 @@ app.service("modelCache", function($rootScope, Accounts, Categories, Transaction
         index[model.name] = index[model.name] || { byID: {} };
     }
 
+    function resetModel(model) {
+        cache[model.name] = [];
+        index[model.name] = { byID: {} };
+    }
+
     // These should be automatically generated eventually
     return {
         loadModel: function(model) {
@@ -97,6 +102,9 @@ app.service("modelCache", function($rootScope, Accounts, Categories, Transaction
         },
         findByID: function(model, id) {
             return index[model.name].byID[id];
+        },
+        reset: function(model) {
+            resetModel(model);
         }
     }
 });
@@ -172,6 +180,7 @@ app.controller("AccountDetailCtrl", function ($scope, $routeParams, $location,  
         var transactions = response.data;
         addTransactions(transactions);
     }, apiErrorHandler);
+    modelCache.reset(Transactions);
     $scope.transactions = modelCache.getCached(Transactions);
 
     $scope.category = null;
