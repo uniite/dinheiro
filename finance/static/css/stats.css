@@ -1,0 +1,4 @@
+table thead td,
+table tbody td:first-child {
+    font-weight: bold;
+}
