@@ -206,6 +206,7 @@ class Account(models.Model):
         statement = backend_api.Client().execute('get_statement', self.institution.ofx_token, account_id)['response']
         # First, update the account fields based on the statement
         self.balance = statement['balance']
+        self.save()
         # Then, sync our transactions with the list in the statement
         new_transactions = []
         for ofx_transaction in statement['transactions']:
@@ -331,7 +332,8 @@ class Category(models.Model):
             # These are easy and efficient, because they map directly to Django ORM filters
             if rule.type in ("contains", "startswith", "endswith"):
                 # Becomes Q(payee__contains="the coffee shop")
-                filter_field = "%s__%s" % (rule.field, rule.type)
+                # Note the "i" prefix, to make the filter case-insensitive
+                filter_field = "%s__i%s" % (rule.field, rule.type)
                 filter = models.Q(**{filter_field: rule.content})
                 # It is either the first condition
                 if conditions is None:
@@ -373,7 +375,7 @@ class CategoryRule(models.Model):
     category = models.ForeignKey(Category, related_name="rules")
 
     def clean(self):
-        self.content = self.content.strip()
+        self.content = self.content.strip().lower()
 
 
 @receiver(models.signals.post_save, sender=Institution)
