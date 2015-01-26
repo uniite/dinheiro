@@ -100,6 +100,10 @@ BOWER_INSTALLED_APPS = (
     'angular-resource#^1.3',
     'angular-route#^1.3',
     'angular-strap#^2.1',
+
+    'ng-polymer-elements#^0.2.0',
+    'Polymer/paper-elements',
+
     'bootstrap#^3.0',
     'flot#0.8',
     'jquery#1.10',

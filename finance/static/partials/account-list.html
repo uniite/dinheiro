@@ -4,6 +4,6 @@
     <div class="span6" ng-repeat="account in accounts">
         <strong>Name:</strong> {{ account.name }}<br />
         <strong>Account Number:</strong> {{ account.censored_account_number }}<br />
-        <a class="btn btn-default" href="#/accounts/{{ account.id }}">View</a>
+        <paper-button raised ng-click="viewAccount()">View</paper-button>
     </div>
 </div>

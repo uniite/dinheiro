@@ -61,6 +61,7 @@ class Client(object):
         request_id = str(uuid.uuid4())
         print "Sending request %s" % request_id
         self.request_queue.write(SecureMessage(body={'id': request_id, 'action': action, 'args': args}))
+        tries = 3
         while True:
             msgs = self.response_queue.get_messages(wait_time_seconds=20)
             if len(msgs) == 0:
@@ -72,6 +73,9 @@ class Client(object):
                 return body
             else:
                 print "Mismatched message: %s" % body
+                tries -= 1
+            if tries == 0:
+                raise StandardError('Failed to execute request')
 
 
 if __name__ == '__main__':
