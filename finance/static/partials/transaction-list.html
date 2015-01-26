@@ -1,34 +1,38 @@
-<div class="span12">
-    <h1>Transactions</h1>
-</div>
+<style>
+    .transaction-list span {
+        padding: 5px 10px;
+    }
+    .transaction-list .date,
+    .transaction-list .type {
+        width: 80px;
+    }
+    .transaction-list .category {
+        width: 180px;
+    }
+    .transaction-list .amount {
+        text-align: right;
+        width: 100px;
+    }
+</style>
 
-<div class="span6" style="padding-top: 1em">
+<div style="padding-top: 1em">
     <strong>Filter: </strong>
-    <input ng-model="search_text" />
+    <paper-input ng-model="search_text"></paper-input>
     <select ng-model="category" ng-options="c.name for c in categories">
         <option value="">(all)</option>
     </select>
 </div>
 
-<div class="span12">
-    <div id="time-chart" style="height: 125px; width: 100%"></div>
-</div>
+<div id="time-chart" style="height: 125px; width: 100%"></div>
 
-<div class="span12">
-    <table class="table">
-        <thead>
-            <th>Date</th>
-            <th>Payee</th>
-            <th class="hidden-xs hidden-sm">Type</th>
-            <th class="hidden-xs">Category</th>
-            <th>Amount</th>
-        </thead>
-        <tr ng-repeat="t in transactions | filter:search_text | filter:categoryFilter | orderBy:sort_field">
-            <td>{{ t.formatted_date }}</td>
-            <td>{{ t.payee }}</td>
-            <td class="hidden-xs hidden-sm">{{ t.type }}</td>
-            <td class="hidden-xs">{{ t.category().name }}</td>
-            <td style="text-align: right;">{{ t.amount }}</td>
-        </tr>
-    </table>
-</div>
+<core-list ng-model="transactions" flex height="30" class="transaction-list">
+    <template>
+        <div horizontal layout>
+            <span class="date hidden-xs">{{ model.formatted_date }}</span>
+            <span flex>{{ model.payee }}</span>
+            <span class="type hidden-xs hidden-sm">{{ model.type }}</span>
+            <span class="category hidden-xs">{{ model.category.name }}</span>
+            <span class="amount">{{ model.amount }}</span>
+        </div>
+    </template>
+</core-list>

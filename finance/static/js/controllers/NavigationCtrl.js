@@ -1,6 +1,8 @@
-angular.module("Dinheiro").controller("NavigationCtrl", function ($location, $scope) {
+angular.module("Dinheiro").controller("NavigationCtrl", function ($location, $rootScope, $scope) {
     $scope.menuClick = function(event) {
-        $location.path(event.target.attributes.href.value);
+        var item = event.target;
+        $rootScope.title = item.innerHTML.trim();
+        $location.path(item.attributes.href.value);
         document.querySelector('#drawer_panel').closeDrawer();
     };
 });

@@ -14,7 +14,8 @@ angular.module("Dinheiro").controller("TransactionListCtrl", function ($scope, $
 
     // Category and Transaction loading
     modelCache.reset(Transactions);
-    $scope.transactions = modelCache.getCached(Transactions);
+    $scope.all_transactions = modelCache.getCached(Transactions);
+    $scope.transactions = $scope.all_transactions;
     // Need both categories and transactions loaded before processing transactions,
     // so use $q to wait for both requests/promises to resolve
     $q.all([
@@ -30,17 +31,40 @@ angular.module("Dinheiro").controller("TransactionListCtrl", function ($scope, $
 
     }, apiErrorHandler);
 
-    // Render the transaction time-chart
-    Stats.transactionTimeChart($("#time-chart"), chart_filter);
+
+    var searchTextFilter = function(transaction) {
+        var search_text = $scope.search_text;
+        if (search_text && search_text.trim() != "") {
+            search_text = search_text.toLowerCase();
+            return transaction.payee.toLowerCase().indexOf(search_text) != -1
+        } else {
+            console.log("filter t");
+            return true;
+        }
+    };
 
     // Category filter function (used on transaction list/table)
-    $scope.categoryFilter = function(transaction) {
+    var categoryFilter = function(transaction) {
         // All categories (unfiltered)
         if ($scope.category == null) {
             return true;
         // Must match selected category
         } else {
-            return transaction.category().id === $scope.category.id;
+            return transaction.category.id === $scope.category.id;
         }
     };
+
+    var filter_transactions = function() {
+        if ($scope.all_transactions.length > 0) {
+            $scope.transactions = $scope.all_transactions.filter(function (trx) {
+                return searchTextFilter(trx) && categoryFilter(trx);
+            });
+        }
+    };
+    $scope.$watch("category", filter_transactions);
+    $scope.$watch("search_text", filter_transactions);
+
+    // Render the transaction time-chart
+    Stats.transactionTimeChart($("#time-chart"), chart_filter);
+
 });

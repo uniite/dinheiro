@@ -7,7 +7,6 @@ angular.module("Dinheiro").controller("AccountListCtrl", function ($location, $s
         };
 
         $scope.onSelect = function(event) {
-            debugger;
            var selected = event.detail.data;
            alert('Selected: ' + selected.name);
         };

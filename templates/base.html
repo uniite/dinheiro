@@ -27,12 +27,14 @@
         <link href="/static/core-icon-button/core-icon-button.html" rel="import">
         <link href="/static/core-icons/core-icons.html" rel="import">
         <link href="/static/core-item/core-item.html" rel="import">
+        <link href="/static/core-list/core-list.html" rel="import">
         <link href="/static/core-media-query/core-media-query.html" rel="import">
         <link href="/static/core-menu/core-menu.html" rel="import">
         <link href="/static/core-menu/core-submenu.html" rel="import">
         <link href="/static/core-selection/core-selection.html" rel="import">
         <link href="/static/core-toolbar/core-toolbar.html" rel="import">
         <link href="/static/paper-button/paper-button.html" rel="import">
+        <link href="/static/paper-input/paper-input.html" rel="import">
         <link href="/static/paper-item/paper-item.html" rel="import">
         <link href="/static/paper-ripple/paper-ripple.html" rel="import">
         <link href="/static/paper-shadow/paper-shadow.html" rel="import">
@@ -63,9 +65,9 @@
 
         {% block extrahead %}{% endblock %}
     </head>
-    <body unresolved>
+    <body fullbleed layout unresolved>
         <core-drawer-panel id="drawer_panel">
-            <core-header-panel drawer ng-controller="NavigationCtrl" style="background-color: white">
+            <core-header-panel drawer fit ng-controller="NavigationCtrl" style="background-color: white">
                 <core-toolbar>
                     <div>Dinheiro</div>
                 </core-toolbar>
@@ -76,16 +78,16 @@
                     <paper-item><a href="{% url 'transaction-stats' %}">Stats</a></paper-item>
                 </core-menu>
             </core-header-panel>
-            <core-header-panel main>
-                <core-toolbar tool flex>
+            <core-header-panel main vertical layout>
+                <core-toolbar tool>
                     <core-icon-button icon="menu" core-drawer-toggle></core-icon-button>
-                    <span flex></span>
+                    <span flex>{% verbatim %}{{ $root.title }}{% endverbatim %}</span>
                     <core-icon-button icon="refresh"></core-icon-button>
                     <core-icon-button icon="search"></core-icon-button>
                 </core-toolbar>
 
                 {% block container %}
-                <div class="container" id="content">
+                <div class="container" id="content" flex vertical layout>
                     {% block content %}{% endblock %}
 
                     <footer>{% block footer %}{% endblock %}</footer>

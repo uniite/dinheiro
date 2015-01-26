@@ -1,9 +1,13 @@
-<h1>Accounts</h1>
-
-<div>
-    <div class="span6" ng-repeat="account in accounts">
-        <strong>Name:</strong> {{ account.name }}<br />
-        <strong>Account Number:</strong> {{ account.censored_account_number }}<br />
-        <paper-button raised ng-click="viewAccount()">View</paper-button>
-    </div>
-</div>
+<core-list ng-model="accounts" style="height: 400px">
+    <template>
+        <div style="padding: 20px" horizontal layout>
+            <div style="width: 200px;">
+                <strong>Name:</strong> {{ model.name }}<br />
+                <strong>Account Number:</strong> {{ model.censored_account_number }}
+            </div>
+            <div horizontal layout center>
+                <paper-button raised ng-click="viewAccount()">View</paper-button>
+            </div>
+        </div>
+    </template>
+</core-list>

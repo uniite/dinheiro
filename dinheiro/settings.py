@@ -102,6 +102,7 @@ BOWER_INSTALLED_APPS = (
     'angular-strap#^2.1',
 
     'ng-polymer-elements#^0.2.0',
+    'Polymer/core-list',
     'Polymer/paper-elements',
 
     'bootstrap#^3.0',
