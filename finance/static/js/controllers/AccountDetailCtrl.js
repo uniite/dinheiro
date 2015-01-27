@@ -1,8 +1,16 @@
-angular.module("Dinheiro").controller("AccountDetailCtrl", function ($controller, $scope, $routeParams, $location, $http, $q, Accounts, Categories, Transactions, modelCache, TransactionLoader, Stats) {
+angular.module("Dinheiro").controller("AccountDetailCtrl", function ($controller, $rootScope, $scope, $routeParams, $location, $http, $q, Accounts, Categories, Transactions, modelCache, TransactionLoader, Stats) {
+
     $scope.account_id = $routeParams.id;
 
+    // https://stackoverflow.com/questions/5043650/how-can-i-correctly-format-currency-using-jquery
+    var formatCurrency = function(amount) {
+        return "$" + parseFloat(amount, 10).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,").toString();
+    };
+
     modelCache.findByID(Accounts, $scope.account_id).then(function(account) {
+        account.usd_balance = formatCurrency(Math.abs(account.balance));
         $scope.account = account;
+        $rootScope.title = $scope.account.name + " " + $scope.account.censored_account_number;
     });
 
     // Let a separate controller handle transactions; we will handle

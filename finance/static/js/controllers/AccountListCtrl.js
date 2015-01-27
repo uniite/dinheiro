@@ -2,8 +2,9 @@ angular.module("Dinheiro").controller("AccountListCtrl", function ($location, $s
     modelCache.getAll(Accounts).then(function(accounts) {
         $scope.accounts = accounts;
 
-        $scope.viewAccount = function() {
-            $location.path("/accounts/" + this.account.id);
+        $scope.viewAccount = function($event) {
+            var account_id = $event.target.dataset.accountId;
+            $location.path("/accounts/" + account_id);
         };
 
         $scope.onSelect = function(event) {

@@ -1,4 +1,4 @@
-<core-list ng-model="accounts" style="height: 400px">
+<core-list ng-model="accounts" ng-click="viewAccount($event)" style="height: 400px">
     <template>
         <div style="padding: 20px" horizontal layout>
             <div style="width: 200px;">
@@ -6,7 +6,7 @@
                 <strong>Account Number:</strong> {{ model.censored_account_number }}
             </div>
             <div horizontal layout center>
-                <paper-button raised ng-click="viewAccount()">View</paper-button>
+                <paper-button data-account-id="{{ model.id }}" raised>View</paper-button>
             </div>
         </div>
     </template>
