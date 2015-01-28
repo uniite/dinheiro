@@ -1,4 +1,6 @@
-angular.module("Dinheiro").controller("AccountListCtrl", function ($location, $scope, Accounts, modelCache) {
+angular.module("Dinheiro").controller("AccountListCtrl", function ($location, $rootScope, $scope, Accounts, modelCache) {
+    $rootScope.title = "Accounts";
+
     modelCache.getAll(Accounts).then(function(accounts) {
         $scope.accounts = accounts;
 

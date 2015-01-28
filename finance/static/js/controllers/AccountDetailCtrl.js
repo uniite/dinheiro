@@ -8,6 +8,10 @@ angular.module("Dinheiro").controller("AccountDetailCtrl", function ($controller
     };
 
     modelCache.findByID(Accounts, $scope.account_id).then(function(account) {
+        if (!account) {
+            console.warn("Bad account");
+            return;
+        }
         account.usd_balance = formatCurrency(Math.abs(account.balance));
         $scope.account = account;
         $rootScope.title = $scope.account.name + " " + $scope.account.censored_account_number;
@@ -18,7 +22,6 @@ angular.module("Dinheiro").controller("AccountDetailCtrl", function ($controller
     $controller("TransactionListCtrl", {$scope: $scope});
 
     $scope.$watch('category', function(category) {
-        console.log($scope.category);
         if (category) {
             $location.search({category: category.name});
         } else {

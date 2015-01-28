@@ -1,0 +1,13 @@
+#toolbar.show-search .refresh-button {
+    display: none;
+}
+
+#toolbar:not(.show-search) .search-input {
+    display: none;
+}
+#toolbar.show-search .title {
+    display: none;
+}
+#toolbar.show-search .search-input {
+    display: inline-block;
+}
