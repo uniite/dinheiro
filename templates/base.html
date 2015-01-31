@@ -15,6 +15,13 @@
                 /*min-height: 2000px;
                 padding-top: 70px;*/
             }
+            html, body {
+              height: 100%;
+              margin: 0;
+            }
+            core-header-panel {
+              height: 100%;
+            }
         </style>
         <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
@@ -26,6 +33,7 @@
         <script type="text/javascript" src="{% static 'webcomponentsjs/webcomponents.js' %}"></script>
         <link href="/static/polymer/polymer.html" rel="import">
         <link href="/static/core-drawer-panel/core-drawer-panel.html" rel="import">
+        <link href="/static/core-header-panel/core-header-panel.html" rel="import">
         <link href="/static/core-icon-button/core-icon-button.html" rel="import">
         <link href="/static/core-icons/core-icons.html" rel="import">
         <link href="/static/core-item/core-item.html" rel="import">
@@ -34,6 +42,7 @@
         <link href="/static/core-menu/core-menu.html" rel="import">
         <link href="/static/core-menu/core-submenu.html" rel="import">
         <link href="/static/core-selection/core-selection.html" rel="import">
+        <link href="/static/core-scroll-header-panel/core-scroll-header-panel.html" rel="import">
         <link href="/static/core-toolbar/core-toolbar.html" rel="import">
         <link href="/static/paper-button/paper-button.html" rel="import">
         <link href="/static/paper-icon-button/paper-icon-button.html" rel="import">
@@ -41,7 +50,7 @@
         <link href="/static/paper-item/paper-item.html" rel="import">
         <link href="/static/paper-ripple/paper-ripple.html" rel="import">
         <link href="/static/paper-shadow/paper-shadow.html" rel="import">
-        <link href="/static/partials/app-imports.html" rel="import">
+        <link href="/static/paper-spinner/paper-spinner.html" rel="import">
 
         <script type="text/javascript" src="{% static 'jquery/jquery.js' %}"></script>
         <script type="text/javascript" src="{% static 'underscore/underscore.js' %}"></script>
@@ -64,6 +73,19 @@
         <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/controllers/NavigationCtrl.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/controllers/ToolbarCtrl.js' %}"></script>
+
+        <script src="/static/js/controllers/AccountDetailCtrl.js" type="text/javascript"></script>
+        <script src="/static/js/controllers/AccountListCtrl.js" type="text/javascript"></script>
+        <script src="/static/js/controllers/CategoryEditCtrl.js" type="text/javascript"></script>
+        <script src="/static/js/controllers/CategoryListCtrl.js" type="text/javascript"></script>
+        <script src="/static/js/controllers/TransactionListCtrl.js" type="text/javascript"></script>
+        <script src="/static/js/controllers/RuleEditCtrl.js" type="text/javascript"></script>
+        <script src="/static/js/controllers/StatsCtrl.js" type="text/javascript"></script>
+        <script src="/static/js/factories/Model.js" type="text/javascript"></script>
+        <script src="/static/js/services/modelCache.js" type="text/javascript"></script>
+        <script src="/static/js/services/Stats.js" type="text/javascript"></script>
+        <script src="/static/js/services/TransactionLoader.js" type="text/javascript"></script>
+
         {% endblock script-libraries %}
 
         {% block scripts %}
@@ -72,7 +94,7 @@
         {% block extrahead %}{% endblock %}
     </head>
     <body fullbleed layout unresolved>
-        <core-drawer-panel id="drawer_panel">
+        <core-drawer-panel id="drawer_panel" flex>
             <core-header-panel drawer ng-controller="NavigationCtrl" style="background-color: white">
                 <core-toolbar>
                     <div>Dinheiro</div>
@@ -81,20 +103,21 @@
                     <paper-item href="/accounts">Accounts</paper-item>
                     <paper-item href="/transactions">Transactions</paper-item>
                     <paper-item href="/categories">Categories</paper-item>
-                    <paper-item><a href="{% url 'transaction-stats' %}">Stats</a></paper-item>
+                    <paper-item href="/stats">Stats</paper-item>
                 </core-menu>
             </core-header-panel>
-            <core-header-panel main vertical layout>
+            <core-header-panel flex main vertical layout>
                 <core-toolbar id="toolbar" ng-controller="ToolbarCtrl" ng-class="toolbarClass">
                     <core-icon-button icon="menu" core-drawer-toggle></core-icon-button>
                     <span class="title" flex>{% verbatim %}{{ title }}{% endverbatim %}</span>
                     <paper-input class="search-input" flex ng-model="searchText"></paper-input>
-                    <paper-icon-button class="refresh-button" icon="refresh"></paper-icon-button>
+                    <paper-spinner id="sync_spinner"></paper-spinner>
+                    <paper-icon-button class="refresh-button" icon="refresh" ng-click="sync()"></paper-icon-button>
                     <paper-icon-button icon="search" ng-click="toggleSearch()"></paper-icon-button>
                 </core-toolbar>
 
                 {% block container %}
-                <div id="content" flex vertical layout>
+                <div class="content" fit>
                     {% block content %}{% endblock %}
 
                     <footer>{% block footer %}{% endblock %}</footer>

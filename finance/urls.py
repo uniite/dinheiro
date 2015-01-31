@@ -13,6 +13,7 @@ router.register(r'categories', views.api.CategoryViewSet)
 router.register(r'transactions', views.api.TransactionViewSet)
 router.register(r'rules', views.api.CategoryRuleViewSet)
 router.register(r'stats', views.api.StatsViewSet, base_name="stats")
+router.register(r'summary_stats', views.api.SummaryStatsViewSet, base_name="summary_stats")
 
 
 class AccountsView(TemplateView):

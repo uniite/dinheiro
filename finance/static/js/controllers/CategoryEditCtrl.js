@@ -1,4 +1,5 @@
-angular.module("Dinheiro").controller("CategoryEditCtrl", function ($scope, $routeParams, $http, Categories, modelCache) {
+angular.module("Dinheiro").controller("CategoryEditCtrl", function ($rootScope, $scope, $routeParams, $http, Categories, modelCache) {
+    $rootScope.title = "Edit Category";
     //var categoriesLoaded = modelCache.loadModel(Categories);
     //$scope.categories = modelCache.getCached(Categories);
 

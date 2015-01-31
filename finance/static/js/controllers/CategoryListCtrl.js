@@ -1,4 +1,6 @@
-angular.module("Dinheiro").controller("CategoryListCtrl", function ($scope, $routeParams, $http, Categories, modelCache) {
+angular.module("Dinheiro").controller("CategoryListCtrl", function ($rootScope, $scope, $routeParams, $http, Categories, modelCache) {
+    $rootScope.title = "Categories";
+
     modelCache.getAll(Categories).then(function(categories) {
         $scope.categories = categories;
     });

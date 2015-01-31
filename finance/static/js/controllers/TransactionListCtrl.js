@@ -1,7 +1,8 @@
-angular.module("Dinheiro").controller("TransactionListCtrl", function ($rootScope, $scope, $routeParams, $location, $http, $q, Categories, Transactions, modelCache, TransactionLoader, Stats) {
+angular.module("Dinheiro").controller("TransactionListCtrl", function ($rootScope, $scope, $routeParams, $templateCache, $location, $http, $q, Categories, Transactions, modelCache, TransactionLoader, SummaryStats) {
     $rootScope.title = "Transactions";
 
     $scope.sort_field = "-date";
+    $templateCache.removeAll();
 
     // If there is a parent controller (ie. AccountDetailCtrl), we may have to filter by account ID
     var chart_filter = {}
@@ -67,6 +68,8 @@ angular.module("Dinheiro").controller("TransactionListCtrl", function ($rootScop
     $rootScope.$watch("searchText", filter_transactions);
 
     // Render the transaction time-chart
-    Stats.transactionTimeChart($("#time-chart"), chart_filter);
+    $scope.$on("$includeContentLoaded", function() {
+        SummaryStats.transactionTimeChart($("#time-chart"), chart_filter);
+    });
 
 });

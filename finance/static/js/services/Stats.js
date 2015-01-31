@@ -1,6 +1,6 @@
-angular.module("Dinheiro").service("Stats", function($http) {
-    this.transactionTimeChart = function(filters) {
-        $http.get("/finance/api/stats", filters).then(function (response) {
+angular.module("Dinheiro").service("SummaryStats", function($http) {
+    this.transactionTimeChart = function($chart, filters) {
+        $http.get("/finance/api/summary_stats", filters).then(function (response) {
             var stats = response.data;
             function parseTimeSeries(data) {
                 return data.map(function(point) {
@@ -11,9 +11,10 @@ angular.module("Dinheiro").service("Stats", function($http) {
                 });
             }
             var oneDay = 24 * 3600 * 1000;
-            var timeChart = $("#time-chart").plot([
+            var data = parseTimeSeries(stats.withdrawals);
+            $chart.plot([
                     {
-                        data: parseTimeSeries(stats.withdrawals),
+                        data: data,
                         color: "rgb(200, 20, 30)"
                     }
                 ],
@@ -25,7 +26,10 @@ angular.module("Dinheiro").service("Stats", function($http) {
                     xaxis: {
                         mode: "time"
                     }
-                });
+                }
+            );
+            console.log($chart.html());
+            console.log(response.data);
         }, apiErrorHandler);
     };
 });

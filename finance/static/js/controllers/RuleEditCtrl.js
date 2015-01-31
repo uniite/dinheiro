@@ -1,4 +1,6 @@
-angular.module("Dinheiro").controller("RuleEditCtrl", function ($scope, $routeParams, Rules, modelCache, $http) {
+angular.module("Dinheiro").controller("RuleEditCtrl", function ($rootScope, $scope, $routeParams, Rules, modelCache, $http) {
+    $rootScope.title = "Edit Rule";
+
     $scope.fields = [
         {name: "Date", value: "date"},
         {name: "Payee", value: "payee"},

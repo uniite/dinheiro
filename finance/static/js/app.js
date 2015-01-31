@@ -18,6 +18,7 @@
           when('/categories/:categoryID/rules/new', {templateUrl: '/static/partials/category-rule-edit.html', controller: "RuleEditCtrl"}).
           when('/transactions', {templateUrl: '/static/partials/transaction-list.html', controller: "TransactionListCtrl", reloadOnSearch: false}).
           when('/rules/:id/edit', {templateUrl: '/static/partials/category-rule-edit.html', controller: "RuleEditCtrl"}).
+          when('/stats', {templateUrl: '/static/partials/stats.html', controller: "StatsCtrl"}).
           otherwise({redirectTo: '/accounts'});
     }]);
 })();

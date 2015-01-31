@@ -203,7 +203,8 @@ class Account(models.Model):
 
         # The backend will get us the transactions we need, based on the institution's credentials,
         account_id = self.backend_id
-        statement = backend_api.Client().execute('get_statement', self.institution.ofx_token, account_id)['response']
+        statement = backend_api.Client().execute('get_statement', self.institution.ofx_token, account_id, 7)['response']
+        print repr(statement)
         # First, update the account fields based on the statement
         self.balance = statement['balance']
         self.save()
@@ -220,6 +221,7 @@ class Account(models.Model):
             local_transaction.full_clean()
             # TODO: Make it validate transaction_id uniqueness down here (less work for the DB)
             local_transaction.save()
+            print "Saved %s" % local_transaction
             new_transactions.append(local_transaction)
 
         # Categorize all the new transactions

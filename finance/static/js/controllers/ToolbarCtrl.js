@@ -12,4 +12,18 @@ angular.module("Dinheiro").controller("ToolbarCtrl", function ($location, $rootS
     $scope.$watch("searchText", function(text) {
         $rootScope.searchText = text;
     });
+
+
+    $scope.sync = function() {
+        if ($rootScope.sync_handler) {
+            $("#sync_spinner").attr("active", "");
+            $(".refresh-button").hide();
+            $rootScope.sync_handler().finally(function () {
+                $("#sync_spinner").removeAttr("active");
+                setTimeout(function () {
+                    $(".refresh-button").show();
+                }, 500);
+            });
+        }
+    };
 });

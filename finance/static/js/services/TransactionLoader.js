@@ -18,7 +18,6 @@ angular.module("Dinheiro").service("TransactionLoader", function(modelCache, Tra
             } else {
                 t.category = matches[0];
             }
-            //t.category_name = t.category.name
 
             return t;
         }));

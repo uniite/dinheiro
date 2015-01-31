@@ -1,4 +1,4 @@
-angular.module("Dinheiro").controller("AccountDetailCtrl", function ($controller, $rootScope, $scope, $routeParams, $location, $http, $q, Accounts, Categories, Transactions, modelCache, TransactionLoader, Stats) {
+angular.module("Dinheiro").controller("AccountDetailCtrl", function ($controller, $rootScope, $scope, $routeParams, $location, $http, $q, Accounts, Categories, TransactionLoader, modelCache) {
 
     $scope.account_id = $routeParams.id;
 
@@ -32,23 +32,23 @@ angular.module("Dinheiro").controller("AccountDetailCtrl", function ($controller
 
     // Setup click events
     // Sync: Synchronizes the account's transactions with the financial institution's data
-    $scope.sync = function(account, event) {
+    $rootScope.sync_handler = function() {
+        var deferred = $q.defer();
+
         if (!$scope.account) return;
-        // Disable the button while the sync runs
-        var button = $(event.target)
-        button.button("loading");
-        var enableButton = function() {
-            button.button("reset");
-        };
         $scope.account.post("sync").then(function(update) {
             // This seems to be a fast way to extend the array (source: http://jsperf.com/angulararrays)
             //$scope.transactions = $scope.transactions.concat(new_transactions);
             $scope.account.balance = update.balance;
-            TransactionLoader.load(update.transactions);
-            enableButton();
+            modelCache.getAll(Categories).then(function(categories) {
+                TransactionLoader.load(update.transactions);
+            });
+            deferred.resolve();
         }, function(error) {
-            enableButton();
             apiErrorHandler(error);
+            deferred.fail();
         });
+
+        return deferred.promise;
     };
 });

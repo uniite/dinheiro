@@ -2,8 +2,10 @@ from collections import defaultdict
 import time
 
 import django.db
+import numpy
 from django.db.models import Sum
 from django.http import Http404
+from django_pandas.io import read_frame
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action, link
 from rest_framework import exceptions
@@ -57,7 +59,7 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     filter_fields = ("account",)
 
 
-class StatsViewSet(viewsets.ViewSet):
+class SummaryStatsViewSet(viewsets.ViewSet):
     def _filtered_stats(self, request, sum_by=None, average_by=None):
         query = models.Transaction.objects
         # TODO: Filter query with user ID
@@ -100,6 +102,34 @@ class StatsViewSet(viewsets.ViewSet):
         return Response({
             "deposits": query.filter(amount__gte=0),
             "withdrawals": query.filter(amount__lt=0)
+        })
+
+
+class StatsViewSet(viewsets.ViewSet):
+    def list(self, request):
+        stats_by = request.GET.get('by', 'category')
+
+        original_df = read_frame(models.Transaction.objects.filter(amount__lt=0).exclude(category__name='Credit Card Payments'),
+                                 fieldnames=['date', 'category', 'amount'])
+        df = original_df.set_index('date').groupby('category').resample('M', how='sum')
+
+        chart_df = df.reset_index()\
+                     .pivot_table(values='amount', index=['date'], columns=['category'], aggfunc=numpy.sum)\
+                     .replace(numpy.NaN, 0)
+
+        months = [x.strftime('%Y-%m-%d') for x in chart_df.index]
+        chart_series = [
+            {'name': category, 'type': 'column', 'data': [abs(float(a)) for a in amounts]}
+            for category,amounts in chart_df.iteritems()]
+
+        table_data = [{'category': category, 'amounts': list(amounts)} for category,amounts in chart_df.iteritems()]
+        total_df = original_df.set_index('date').resample('M', how='sum').transpose()
+        table_data.append(({'category': 'Total', 'amounts': total_df.values[0]}))
+
+        return Response({
+            'months': months,
+            'series': chart_series,
+            'table_data': table_data,
         })
 
 

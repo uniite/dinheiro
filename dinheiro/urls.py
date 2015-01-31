@@ -12,9 +12,9 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'dinheiro.views.home', name='home'),
     # url(r'^dinheiro/', include('dinheiro.foo.urls')),
-        url(r'^$', HomeView.as_view()),
+    url(r'^$', HomeView.as_view()),
 
-        url(r'^finance/', include('finance.urls')),
+    url(r'^finance/', include('finance.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -23,9 +23,9 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 )
 
-"""if settings.DEBUG:
-        urlpatterns += patterns('',
-                (r'^%s/(?P<path>.*)$' % settings, 'django.views.static.serve',
-                {'document_root': settings., 'show_indexes': True})
-        )
-"""
+# if settings.DEBUG:
+#     urlpatterns += patterns('',
+#         (r'^%s/(?P<path>.*)$' % settings, 'django.views.static.serve',
+#         {'document_root': settings.STATIC_ROOT, 'show_indexes': True})
+#     )
+

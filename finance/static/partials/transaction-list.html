@@ -24,10 +24,9 @@
     </select>
 </div>
 -->
+<div id="time-chart" class="core-header" style="height: 100px"></div>
 
-<div id="time-chart" class="hidden-xs" style="height: 125px"></div>
-
-<core-list ng-model="transactions" flex height="30" class="transaction-list">
+<core-list flex ng-model="transactions" height="30" class="transaction-list" style="overflow: hidden">
     <template>
         <div horizontal layout>
             <span class="date hidden-xs">{{ model.formatted_date }}</span>
