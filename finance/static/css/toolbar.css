@@ -1,3 +1,8 @@
+core-toolbar {
+    background: #2eaf5e;
+    color: white;
+}
+
 #toolbar.show-search .refresh-button {
     display: none;
 }

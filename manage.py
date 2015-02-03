@@ -3,9 +3,9 @@ import os
 import sys
 
 # Auto-load virtual env
-if os.path.exists("venv"):
-    activate_this = "venv/bin/activate_this.py"
-    execfile(activate_this, dict(__file__=activate_this))
+#if os.path.exists("venv"):
+#    activate_this = "venv/bin/activate_this.py"
+#    execfile(activate_this, dict(__file__=activate_this))
 
 # Auto-load environment variables
 if os.path.exists(".env"):

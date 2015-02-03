@@ -16,11 +16,12 @@ angular.module("Dinheiro").controller("ToolbarCtrl", function ($location, $rootS
 
     $scope.sync = function() {
         if ($rootScope.sync_handler) {
-            $("#sync_spinner").attr("active", "");
+            $("#sync_spinner").attr("active", "").removeClass("hidden");
             $(".refresh-button").hide();
             $rootScope.sync_handler().finally(function () {
                 $("#sync_spinner").removeAttr("active");
                 setTimeout(function () {
+                    $("#sync_spinner").addClass("hidden");
                     $(".refresh-button").show();
                 }, 500);
             });

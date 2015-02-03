@@ -5,7 +5,7 @@ angular.module("Dinheiro").controller("TransactionListCtrl", function ($rootScop
     $templateCache.removeAll();
 
     // If there is a parent controller (ie. AccountDetailCtrl), we may have to filter by account ID
-    var chart_filter = {}
+    var chart_filter = {};
     var transactions_promise;
     if ($scope.account_id) {
         chart_filter.account = $scope.account_id;
@@ -31,6 +31,8 @@ angular.module("Dinheiro").controller("TransactionListCtrl", function ($rootScop
     ]).then(function(responses) {
         var transactions = responses[1].data;
         TransactionLoader.load(transactions, $scope.categories);
+        $("#list_loading").addClass("hidden");
+        $(".transaction-list").removeClass("hidden");
 
     }, apiErrorHandler);
 
@@ -68,8 +70,12 @@ angular.module("Dinheiro").controller("TransactionListCtrl", function ($rootScop
     $rootScope.$watch("searchText", filter_transactions);
 
     // Render the transaction time-chart
-    $scope.$on("$includeContentLoaded", function() {
+    if ($scope.account_id) {
+        $scope.$on("$includeContentLoaded", function () {
+            SummaryStats.transactionTimeChart($("#time-chart"), chart_filter);
+        });
+    } else {
         SummaryStats.transactionTimeChart($("#time-chart"), chart_filter);
-    });
+    }
 
 });

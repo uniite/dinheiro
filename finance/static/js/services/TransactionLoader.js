@@ -2,10 +2,12 @@ angular.module("Dinheiro").service("TransactionLoader", function(modelCache, Tra
     var default_category = {id: 0, name: ""};
 
     this.load = function(transactions, categories) {
-        modelCache.loadCustom(Transactions, transactions.map(function(t) {
+        transactions = transactions.map(function(t) {
+            // Format date
             t.date = new Date(t.date);
-            t.formatted_date = t.date.toLocaleDateString();
+            t.formatted_date = moment(t.date).format("MMM D, YYYY");
 
+            // Map category
             var category_id = t.category;
             if (!categories) {
                 t.category = default_category;
@@ -20,6 +22,14 @@ angular.module("Dinheiro").service("TransactionLoader", function(modelCache, Tra
             }
 
             return t;
-        }));
+        });
+        modelCache.loadCustom(Transactions, transactions);
+
+        // Setup groups on core-list (one per day_
+        var list = $(".transaction-list").get(0);
+        var counts = _.countBy(transactions, function(t) { return t.formatted_date; });
+        list.groups = _.keys(counts).map(function(k) {
+            return { length: counts[k], data: { date: k } };
+        });
     };
 });

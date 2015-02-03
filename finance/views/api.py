@@ -1,4 +1,6 @@
 from collections import defaultdict
+from dateutil.relativedelta import relativedelta
+from datetime import date
 import time
 
 import django.db
@@ -6,6 +8,7 @@ import numpy
 from django.db.models import Sum
 from django.http import Http404
 from django_pandas.io import read_frame
+import pandas
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action, link
 from rest_framework import exceptions
@@ -109,15 +112,31 @@ class StatsViewSet(viewsets.ViewSet):
     def list(self, request):
         stats_by = request.GET.get('by', 'category')
 
-        original_df = read_frame(models.Transaction.objects.filter(amount__lt=0).exclude(category__name='Credit Card Payments'),
-                                 fieldnames=['date', 'category', 'amount'])
+        # Go back about 3 months ago.
+        # Should give this partial month plus the two previous months
+        start_date = date.today() - relativedelta(months=2)
+        start_date = date(start_date.year, start_date.month, 1)
+
+        transactions = models.Transaction.objects.filter(amount__lt=0, date__gt=start_date)\
+                                 .exclude(category__name='Credit Card Payments')
+        for t in transactions:
+            if t.category:
+                if t.category.parent:
+                    t.category = t.category.parent
+            else:
+                t.category = models.Category(name='Uncategorized')
+
+        trx = [{'date': t.date, 'category': t.category.name, 'amount': t.amount} for t in transactions]
+
+        original_df = pandas.DataFrame(trx)
+        #original_df = read_frame(trx, fieldnames=['date', 'category', 'amount'])
         df = original_df.set_index('date').groupby('category').resample('M', how='sum')
 
         chart_df = df.reset_index()\
                      .pivot_table(values='amount', index=['date'], columns=['category'], aggfunc=numpy.sum)\
                      .replace(numpy.NaN, 0)
 
-        months = [x.strftime('%Y-%m-%d') for x in chart_df.index]
+        months = [x.strftime('%Y-%m') for x in chart_df.index]
         chart_series = [
             {'name': category, 'type': 'column', 'data': [abs(float(a)) for a in amounts]}
             for category,amounts in chart_df.iteritems()]

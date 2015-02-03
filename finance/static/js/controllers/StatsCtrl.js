@@ -1,5 +1,5 @@
 angular.module("Dinheiro").controller("StatsCtrl", function ($http, $rootScope, $scope) {
-    $rootScope.title = "Transaction Stats";
+    $rootScope.title = "Stats";
 
     $http.get('/finance/api/stats').then(function(response) {
         $scope.months = response.data.months;
@@ -9,9 +9,7 @@ angular.module("Dinheiro").controller("StatsCtrl", function ($http, $rootScope, 
             chart: {
                 type: 'column'
             },
-            title: {
-                text: 'Spending per Month by Category'
-            },
+            title: false,
             xAxis: {
                 categories: response.data.months,
                 tickmarkPlacement: 'on',

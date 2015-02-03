@@ -11,6 +11,7 @@ site_path = lambda *x: os.path.join(SITE_ROOT, *x)
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -31,7 +32,7 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -85,11 +86,13 @@ STATICFILES_DIRS = (
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
+    #'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'djangobower.finders.BowerFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # Where to store downloaded bower components
 BOWER_COMPONENTS_ROOT = site_path('components')
@@ -106,6 +109,7 @@ BOWER_INSTALLED_APPS = (
     'Polymer/paper-elements',
 
     'bootstrap#^3.0',
+    'fastclick#^1.0.6',
     'flot#0.8',
     'jquery#1.10',
     'knockout-mapping#2.4',

@@ -1,6 +1,7 @@
 <style>
     .transaction-list span {
-        padding: 5px 10px;
+    }
+    .transaction-list .payee {
     }
     .transaction-list .date,
     .transaction-list .type {
@@ -11,7 +12,18 @@
     }
     .transaction-list .amount {
         text-align: right;
+        padding-right: 14px;
         width: 100px;
+    }
+    .transaction-list .item {
+        padding: 8px 0;
+        margin-left: 4px;
+        border-bottom: solid #dbdbdb 1px;
+    }
+    .transaction-list .divider {
+        color: #777;
+        padding: 14px 0 0 4px;
+        text-align: left;
     }
 </style>
 
@@ -26,11 +38,16 @@
 -->
 <div id="time-chart" class="core-header" style="height: 100px"></div>
 
-<core-list flex ng-model="transactions" height="30" class="transaction-list" style="overflow: hidden">
+<div fit id="list_loading" center center-justified horizontal layout>
+    <paper-spinner active></paper-spinner>
+</div>
+<core-list flex ng-model="transactions" height="30" class="transaction-list hidden" style="overflow: hidden">
     <template>
-        <div horizontal layout>
-            <span class="date hidden-xs">{{ model.formatted_date }}</span>
-            <span flex>{{ model.payee }}</span>
+        <div divider class="divider">
+            {{ groupModel.date }}
+        </div>
+        <div horizontal layout class="item">
+            <span flex class="payee">{{ model.payee }}</span>
             <span class="type hidden-xs hidden-sm">{{ model.type }}</span>
             <span class="category hidden-xs">{{ model.category.name }}</span>
             <span class="amount">{{ model.amount }}</span>

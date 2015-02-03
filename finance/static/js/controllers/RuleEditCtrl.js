@@ -1,6 +1,4 @@
 angular.module("Dinheiro").controller("RuleEditCtrl", function ($rootScope, $scope, $routeParams, Rules, modelCache, $http) {
-    $rootScope.title = "Edit Rule";
-
     $scope.fields = [
         {name: "Date", value: "date"},
         {name: "Payee", value: "payee"},
@@ -20,14 +18,14 @@ angular.module("Dinheiro").controller("RuleEditCtrl", function ($rootScope, $sco
 
     // We're either editing an existing rule
     if ($routeParams.id) {
-        $scope.title = "Edit Rule";
+        $rootScope.title = "Edit Rule";
         $http.get("/finance/api/rules/" + $routeParams.id).then(function(response) {
             $scope.rule  = response.data;
             loadCategory();
         });
     // or a new rule
     } else {
-        $scope.title = "New Rule";
+        $rootScope.title = "New Rule";
         $scope.rule = {
             category: $routeParams.categoryID,
             type: "startswith",

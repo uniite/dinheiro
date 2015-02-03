@@ -4,9 +4,11 @@
         {% load static %}
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
         <title>{% block title %}Dinheiro{% endblock %}</title>
         {% block meta-tags %}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% endblock meta-tags %}
         <style>
             /* Ensure the body starts below the top navbar
@@ -18,9 +20,10 @@
             html, body {
               height: 100%;
               margin: 0;
+              padding: 0
+              overflow: hidden;
             }
             core-header-panel {
-              height: 100%;
             }
         </style>
         <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
@@ -51,11 +54,14 @@
         <link href="/static/paper-ripple/paper-ripple.html" rel="import">
         <link href="/static/paper-shadow/paper-shadow.html" rel="import">
         <link href="/static/paper-spinner/paper-spinner.html" rel="import">
+        <link href="/static/paper-tabs/paper-tabs.html" rel="import">
 
         <script type="text/javascript" src="{% static 'jquery/jquery.js' %}"></script>
         <script type="text/javascript" src="{% static 'underscore/underscore.js' %}"></script>
         <script type="text/javascript" src="{% static 'underscore.string/lib/underscore.string.js' %}"></script>
+        <script type="text/javascript" src="{% static 'fastclick/fastclick.js' %}"></script>
         <script type="text/javascript" src="{% static 'flot/jquery.flot.js' %}"></script>
+        <script type="text/javascript" src="{% static 'flot/jquery.flot.resize.js' %}"></script>
         <script type="text/javascript" src="{% static 'flot/jquery.flot.threshold.js' %}"></script>
         <script type="text/javascript" src="{% static 'flot/jquery.flot.time.js' %}"></script>
         <script type="text/javascript" src="{% static 'bootstrap/dist/js/bootstrap.js' %}"></script>
@@ -94,7 +100,7 @@
         {% block extrahead %}{% endblock %}
     </head>
     <body fullbleed layout unresolved>
-        <core-drawer-panel id="drawer_panel" flex>
+        <core-drawer-panel id="drawer_panel" flex responsiveWidth="800px">
             <core-header-panel drawer ng-controller="NavigationCtrl" style="background-color: white">
                 <core-toolbar>
                     <div>Dinheiro</div>
@@ -111,7 +117,7 @@
                     <core-icon-button icon="menu" core-drawer-toggle></core-icon-button>
                     <span class="title" flex>{% verbatim %}{{ title }}{% endverbatim %}</span>
                     <paper-input class="search-input" flex ng-model="searchText"></paper-input>
-                    <paper-spinner id="sync_spinner"></paper-spinner>
+                    <paper-spinner id="sync_spinner" active class="hidden"></paper-spinner>
                     <paper-icon-button class="refresh-button" icon="refresh" ng-click="sync()"></paper-icon-button>
                     <paper-icon-button icon="search" ng-click="toggleSearch()"></paper-icon-button>
                 </core-toolbar>
