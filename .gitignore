@@ -1,4 +1,7 @@
+.env
 .idea/
 .keys/
+venv/
+*.dylib
 *.sqlite3
 *.pyc
