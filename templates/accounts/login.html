@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block css %}
+<style>
+form {
+    width: 300px;
+}
+#login_container {
+    padding: 20px;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function() {
+    $("#submit").click(function() { $("form").submit(); });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+    <core-drawer-panel id="drawer_panel" flex responsiveWidth="800px">
+        <core-header-panel drawer ng-controller="NavigationCtrl" style="background-color: white">
+            <core-toolbar>
+                <div>Dinheiro</div>
+            </core-toolbar>
+        </core-header-panel>
+        <core-header-panel flex main vertical layout>
+            <core-toolbar id="toolbar" ng-controller="ToolbarCtrl" ng-class="toolbarClass">
+                <span class="title" flex>Login</span>
+            </core-toolbar>
+
+            <div id="login_container" fit vertical layout>
+                <br />
+                {% if form.errors %}
+                <p>Your username and password didn't match. Please try again.</p>
+                {% endif %}
+                <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+                    {% csrf_token %}
+                    <paper-input-decorator  label="Username" floatingLabel="true">
+                        <input name="username" type="text" is="core-input" />
+                    </paper-input-decorator>
+                    <paper-input-decorator label="Password" floatingLabel="true">
+                        <input name="password" type="password" is="core-input" />
+                    </paper-input-decorator>
+                    <br />
+                    <br />
+                    <paper-button id="submit" raised>Login</paper-button>
+                    <input type="hidden" name="next" value="/" />
+                </form>
+            </div>
+        </core-header-panel>
+    </core-drawer-panel>
+{% endblock %}

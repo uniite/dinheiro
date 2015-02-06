@@ -1,10 +1,8 @@
 from django.conf.urls import patterns, include, url
-from django.views.generic.base import TemplateView
+from rest_framework.routers import DefaultRouter
 
 from finance import views
-from finance.views.transactions import TransactionListView
 
-from rest_framework.routers import DefaultRouter
 
 # Create a router and register our viewsets with it
 router = DefaultRouter(trailing_slash=False)
@@ -16,24 +14,12 @@ router.register(r'stats', views.api.StatsViewSet, base_name="stats")
 router.register(r'summary_stats', views.api.SummaryStatsViewSet, base_name="summary_stats")
 
 
-class AccountsView(TemplateView):
-    template_name = "finance/accounts.html"
-
-
-class CategoriesView(TemplateView):
-    template_name = "finance/categories.html"
-
-
 urlpatterns = patterns('',
-        url(r'^api/', include(router.urls)),
-        url(r'^accounts/?$', AccountsView.as_view(), name='accounts'),
-        url(r'^categories/?$', CategoriesView.as_view(), name='categories'),
         url(r'^$', 'finance.views.index', name='inst-index'),
+        url(r'^api/', include(router.urls)),
         url(r'^institutions/?$', 'finance.views.institutions.list', name='inst-list'),
-        url(r'^institutions/(\d+)/?$', 'finance.views.show', name='inst-show'),
         url(r'^institutions/add/(\d+)?$', 'finance.views.add', name='inst-add'),
         url(r'^institutions/search/?$', 'finance.views.search', name='inst-search'),
         url(r'^institutions/search_results/?$', 'finance.views.search_results', name='inst-search-results'),
-        url(r'^transactions/?$', TransactionListView.as_view(), name='transaction-list'),
         url(r'^transactions/stats/?$', 'finance.views.transactions.stats', name='transaction-stats'),
 )

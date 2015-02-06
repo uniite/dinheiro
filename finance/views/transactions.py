@@ -1,29 +1,14 @@
-from django_pandas.io import read_frame
-from django.shortcuts import HttpResponse, render_to_response
-from django.views.generic import ListView
 import json
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import HttpResponse, render_to_response
+from django_pandas.io import read_frame
 import numpy
 
-from finance.models import Account, Transaction
+from finance.models import Transaction
 
 
-
-class TransactionListView(ListView):
-    model = Transaction
-
-
-class AccountTransactionsListView(ListView):
-
-    def get_queryset(self):
-        self.account = get_object_or_404(Account, id=self.args[0])
-        return self.account.transaction_set.all()
-
-    def get_context_data(self, **kwargs):
-        context = super(AccountTransactionsListView, self).get_context_data(**kwargs)
-        context["account"] = self.account
-        return context
-
-
+@login_required
 def stats(request):
     stats_by = request.GET.get('by', 'category')
 

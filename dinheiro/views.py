@@ -1,4 +1,7 @@
-from django.views.generic import TemplateView
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render_to_response
 
-class HomeView(TemplateView):
-    template_name = "app.html"
+
+@login_required
+def home(request):
+    return render_to_response('app.html', {'user': request.user})

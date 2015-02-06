@@ -1,15 +1,17 @@
 import django.db
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from ofxhome import OFXHome
 
 from finance.forms import InstitutionForm
-from finance.models import Account, Institution, Transaction
+from finance.models import Institution
 
 import api
 
 
+@login_required
 def add(request, id):
     inst = Institution()
     if request.method == "GET":
@@ -33,12 +35,15 @@ def add(request, id):
 
     return render(request, "institutions/add.html", {"inst_form": form})
 
+@login_required
 def index(request):
     return render(request, "institutions/index.html", {"institutions": Institution.objects.all()})
 
+@login_required
 def search(request):
      return render(request, "institutions/search.html")
 
+@login_required
 def search_results(request):
     if "q" in request.POST:
         results = OFXHome.search(request.POST["q"])
@@ -46,6 +51,7 @@ def search_results(request):
         results = []
     return render(request, "institutions/search_results.html", {"results": results})
 
+@login_required
 def show(request, pk):
     inst = get_object_or_404(Institution, pk=pk)
     accounts = {}

@@ -1,6 +1,6 @@
 // Remove delay for click/touch actions on mobile WebKit
 $(function() {
-    FastClick.attach(document.body);
+    //FastClick.attach(document.body);
 });
 
 (function() {
@@ -38,6 +38,6 @@ $(function() {
 })();
 
 function apiErrorHandler() {
-    alert("Something broke!");
+    console.error("Something broke!");
 }
 

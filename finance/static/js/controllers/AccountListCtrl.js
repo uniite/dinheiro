@@ -8,10 +8,5 @@ angular.module("Dinheiro").controller("AccountListCtrl", function ($location, $r
             var account_id = $event.target.dataset.accountId;
             $location.path("/accounts/" + account_id);
         };
-
-        $scope.onSelect = function(event) {
-           var selected = event.detail.data;
-           alert('Selected: ' + selected.name);
-        };
     });
 });
