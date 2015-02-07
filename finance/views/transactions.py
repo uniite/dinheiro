@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponse, render_to_response
-from django_pandas.io import read_frame
+from pandas import DataFrame
 import numpy
 
 from finance.models import Transaction
@@ -12,8 +12,9 @@ from finance.models import Transaction
 def stats(request):
     stats_by = request.GET.get('by', 'category')
 
-    original_df = read_frame(Transaction.objects.filter(amount__lt=0).exclude(category__name='Credit Card Payments'),
-                             fieldnames=['date', 'category', 'amount'])
+    trx = Transaction.objects.filter(amount__lt=0).exclude(category__name='Credit Card Payments')
+    original_df = DataFrame(data=[{k: getattr(t, k) for k in ('date', 'category', 'amount')} for t in trx])
+
     df = original_df.set_index('date').groupby('category').resample('M', how='sum')
 
     chart_df = df.reset_index()\
