@@ -1,9 +1,8 @@
 from functools import wraps
+from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.staticfiles.views import serve as serve_static
-
-from dinheiro import settings
 
 
 admin.autodiscover()
