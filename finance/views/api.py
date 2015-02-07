@@ -7,7 +7,6 @@ import django.db
 import numpy
 from django.db.models import Sum
 from django.http import Http404
-from django_pandas.io import read_frame
 import pandas
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action, link
@@ -129,7 +128,6 @@ class StatsViewSet(viewsets.ViewSet):
         trx = [{'date': t.date, 'category': t.category.name, 'amount': t.amount} for t in transactions]
 
         original_df = pandas.DataFrame(trx)
-        #original_df = read_frame(trx, fieldnames=['date', 'category', 'amount'])
         df = original_df.set_index('date').groupby('category').resample('M', how='sum')
 
         chart_df = df.reset_index()\

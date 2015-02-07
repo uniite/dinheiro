@@ -9,11 +9,10 @@ import libnacl.public
 import libnacl.utils
 
 # Used for communication over SQS
-RESPONSE_SECRET_KEY_PATH = ".keys/response"
-REQUEST_PUBLIC_KEY_PATH = ".keys/request.pub"
-CREDENTIAL_PUBLIC_KEY_PATH = ".keys/credential.pub"
-REQUEST_QUEUE = os.environ.get('REQUEST_QUEUE', 'dinheiro-backend-request-dev')
-RESPONSE_QUEUE = os.environ.get('RESPONSE_QUEUE', 'dinheiro-backend-response-dev')
+RESPONSE_SECRET_KEY_PATH = os.environ['RESPONSE_SECRET_KEY']
+REQUEST_PUBLIC_KEY_PATH = os.environ['REQUEST_PUBLIC_KEY']
+REQUEST_QUEUE = os.environ['REQUEST_QUEUE']
+RESPONSE_QUEUE = os.environ['RESPONSE_QUEUE']
 
 
 
@@ -25,11 +24,6 @@ def load_key(path):
 def transport_box():
     secret_key = load_key(RESPONSE_SECRET_KEY_PATH)
     public_key = load_key(REQUEST_PUBLIC_KEY_PATH)
-    return libnacl.public.Box(secret_key, public_key)
-
-def credential_box():
-    secret_key = load_key(RESPONSE_SECRET_KEY_PATH)
-    public_key = load_key(CREDENTIAL_PUBLIC_KEY_PATH)
     return libnacl.public.Box(secret_key, public_key)
 
 

@@ -4,12 +4,8 @@
 import django
 import os
 DJANGO_ROOT = os.path.dirname(os.path.realpath(django.__file__))
-SITE_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+SITE_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../'))
 site_path = lambda *x: os.path.join(SITE_ROOT, *x)
-
-
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 
 ADMINS = (
@@ -17,18 +13,6 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'dinheiro',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': os.environ['BOXEN_MYSQL_SOCKET'],  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
-    }
-}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -118,9 +102,6 @@ BOWER_INSTALLED_APPS = (
     'underscore#1.5',
     'underscore.string#2.3',
 )
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'iy0c*kpd(_l)o27ye&t%#e&sq!yl=ob%0*(@a5i29t+p(05yds'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
