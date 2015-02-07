@@ -7,10 +7,7 @@ RUN apt-get install -y build-essential curl git gnupg libffi-dev libmysqlclient-
 # Install libsodium
 RUN mkdir build
 RUN cd build && curl -O https://download.libsodium.org/libsodium/releases/libsodium-1.0.2.tar.gz
-RUN cd build && curl -O https://download.libsodium.org/libsodium/releases/libsodium-1.0.2.tar.gz.sig
-ADD libsodium.gpg.key /build/
-RUN gpg --import /build/libsodium.gpg.key
-RUN gpg --verify /build/*.sig
+RUN cd build && sha256sum libsodium-1.0.2.tar.gz | grep 961d8f10047f545ae658bcc73b8ab0bf2c312ac945968dd579d87c768e5baa19
 RUN cd build && tar xzfv libsodium-1.0.2.tar.gz
 RUN cd build/libsodium-1.0.2 && ./configure && make && make check && make install
 RUN rm -rf build
