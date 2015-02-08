@@ -1,5 +1,1 @@
-# We need to install some compiled libs via pip for dev, but in production we use system packages
-# Just make sure these match what Debian stable is using
 -r base.txt
-numpy==1.6.2
-pandas==0.8.0
