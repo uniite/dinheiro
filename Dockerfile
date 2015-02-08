@@ -12,9 +12,6 @@ RUN cd build && tar xzfv libsodium-1.0.2.tar.gz
 RUN cd build/libsodium-1.0.2 && ./configure && make && make check && make install
 RUN rm -rf build
 
-# Install tedious compiled libs for python
-RUN apt-get install -y python-numpy python-pandas-lib
-
 # Copy the requirements file early so we have a cached copy of the python libs
 ADD requirements/ /requirements
 RUN pip install -r requirements/production.txt
