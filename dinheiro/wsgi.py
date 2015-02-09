@@ -25,7 +25,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dinheiro.settings")
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
 from django.core.wsgi import get_wsgi_application
+
 application = get_wsgi_application()
+
+# In production, we use WhiteNoise for static assets (as an origin for the CDN)
+if os.environ["DJANGO_SETTINGS_MODULE"] == "dinheiro.settings.production":
+    from whitenoise.django import DjangoWhiteNoise
+    application = DjangoWhiteNoise(application)
 
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication

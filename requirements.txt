@@ -30,4 +30,5 @@ python-dateutil==2.4.0
 pytz==2013b
 six==1.9.0
 uwsgi==2.0.9
+whitenoise==1.0.6
 wsgiref==0.1.2
