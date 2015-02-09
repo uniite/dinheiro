@@ -9,10 +9,10 @@ import libnacl.public
 import libnacl.utils
 
 # Used for communication over SQS
-RESPONSE_SECRET_KEY_PATH = os.environ['RESPONSE_SECRET_KEY']
-REQUEST_PUBLIC_KEY_PATH = os.environ['REQUEST_PUBLIC_KEY']
-REQUEST_QUEUE = os.environ['REQUEST_QUEUE']
-RESPONSE_QUEUE = os.environ['RESPONSE_QUEUE']
+RESPONSE_SECRET_KEY_PATH = os.environ.get('RESPONSE_SECRET_KEY')
+REQUEST_PUBLIC_KEY_PATH = os.environ.get('REQUEST_PUBLIC_KEY')
+REQUEST_QUEUE = os.environ.get('REQUEST_QUEUE')
+RESPONSE_QUEUE = os.environ.get('RESPONSE_QUEUE')
 
 
 

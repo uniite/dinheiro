@@ -13,12 +13,15 @@ RUN cd build/libsodium-1.0.2 && ./configure && make && make check && make instal
 RUN rm -rf build
 
 # Copy the requirements file early so we have a cached copy of the python libs
-ADD requirements.txt
+ADD requirements.txt /
 RUN pip install -r requirements.txt
 
 # Copy the app, and remove extra files (.pyc, etc.)
 ADD . /app
 RUN cd app && git clean -xfd && rm -rf .git
+
+# Prepare static files
+RUN cd /app && ./manage.py collectstatic --noinput
 
 ENV DJANGO_SETTINGS_MODULE dinheiro.settings.production
 
