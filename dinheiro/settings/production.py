@@ -12,11 +12,11 @@ if 'ALLOWED_HOSTS' in os.environ:
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'dinheiro.sqlite3',
-        # 'USER': 'root',
-        # 'PASSWORD': '',
-        # 'HOST': os.environ['MYSQL_HOST'],
-        # 'PORT': os.environ['MYSQL_PORT'],
+        'ENGINE': os.environ['DB_ENGINE'],
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': os.environ['DB_HOST'],
+        'PORT': os.environ['DB_PORT'],
     }
 }
