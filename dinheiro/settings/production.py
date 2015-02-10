@@ -12,12 +12,17 @@ if 'ALLOWED_HOSTS' in os.environ:
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ['DB_ENGINE'],
-        'NAME': os.environ['DB_NAME'],
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME', 'dinheiro'),
         'USER': os.environ['DB_USER'],
         'PASSWORD': os.environ['DB_PASSWORD'],
         'HOST': os.environ['DB_HOST'],
-        'PORT': os.environ['DB_PORT'],
+        'PORT': os.environ.get('DB_PORT', 3306),
+        'OPTIONS': {
+            'ssl': {
+                'ca': os.environ.get('DB_CA_PATH', '/app/config/amazon-rds-ca-cert.pem')
+            }
+        }
     }
 }
 
