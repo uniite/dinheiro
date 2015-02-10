@@ -27,4 +27,5 @@ ENV DJANGO_SETTINGS_MODULE dinheiro.settings.production
 
 EXPOSE 9090
 WORKDIR /app
-CMD uwsgi --http :9090 --uid nobody --gid nogroup --wsgi-file dinheiro/wsgi.py --master --processes 4 --threads 1
+USER nobody
+CMD uwsgi --http :9090 --wsgi-file dinheiro/wsgi.py --master --processes 4 --threads 1
