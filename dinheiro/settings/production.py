@@ -29,3 +29,7 @@ DATABASES = {
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+# https://docs.djangoproject.com/en/1.7/ref/settings/#std:setting-SECURE_PROXY_SSL_HEADER
+# Assumes nginx or smilar is running as a SSL proxy in front of this app
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
