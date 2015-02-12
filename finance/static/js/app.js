@@ -7,7 +7,9 @@ $(function() {
 
     var app = angular.module("Dinheiro", ["mgcrea.ngStrap", "ngRoute", "ng-polymer-elements", "restangular"]);
 
-    app.config(function(RestangularProvider) {
+    app.config(function($httpProvider, RestangularProvider) {
+        $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
         RestangularProvider.setBaseUrl("/finance/api");
     });
 

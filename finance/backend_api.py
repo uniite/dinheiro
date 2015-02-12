@@ -9,22 +9,19 @@ import libnacl.public
 import libnacl.utils
 
 # Used for communication over SQS
-RESPONSE_SECRET_KEY_PATH = os.environ.get('RESPONSE_SECRET_KEY')
-REQUEST_PUBLIC_KEY_PATH = os.environ.get('REQUEST_PUBLIC_KEY')
+RESPONSE_SECRET_KEY = os.environ.get('RESPONSE_SECRET_KEY').strip()
+REQUEST_PUBLIC_KEY = os.environ.get('REQUEST_PUBLIC_KEY').strip()
 REQUEST_QUEUE = os.environ.get('REQUEST_QUEUE')
 RESPONSE_QUEUE = os.environ.get('RESPONSE_QUEUE')
 
 
 
-def load_key(path):
-    with open(path, 'r') as f:
-        return binascii.unhexlify(f.read().strip())
+def load_key(key):
+    return binascii.unhexlify(key)
 
 
 def transport_box():
-    secret_key = load_key(RESPONSE_SECRET_KEY_PATH)
-    public_key = load_key(REQUEST_PUBLIC_KEY_PATH)
-    return libnacl.public.Box(secret_key, public_key)
+    return libnacl.public.Box(load_key(RESPONSE_SECRET_KEY), load_key(REQUEST_PUBLIC_KEY))
 
 
 class SecureMessage(boto.sqs.message.RawMessage):
