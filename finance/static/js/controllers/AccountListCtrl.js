@@ -6,7 +6,9 @@ angular.module("Dinheiro").controller("AccountListCtrl", function ($location, $r
 
         $scope.viewAccount = function($event) {
             var account_id = $event.target.dataset.accountId;
-            $location.path("/accounts/" + account_id);
+            if (account_id) {
+                $location.path("/accounts/" + account_id);
+            }
         };
     });
 });
