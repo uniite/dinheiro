@@ -9,8 +9,8 @@ import libnacl.public
 import libnacl.utils
 
 # Used for communication over SQS
-RESPONSE_SECRET_KEY = os.environ.get('RESPONSE_SECRET_KEY').strip()
-REQUEST_PUBLIC_KEY = os.environ.get('REQUEST_PUBLIC_KEY').strip()
+RESPONSE_SECRET_KEY = os.environ.get('RESPONSE_SECRET_KEY')
+REQUEST_PUBLIC_KEY = os.environ.get('REQUEST_PUBLIC_KEY')
 REQUEST_QUEUE = os.environ.get('REQUEST_QUEUE')
 RESPONSE_QUEUE = os.environ.get('RESPONSE_QUEUE')
 
