@@ -141,6 +141,9 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 
+    # Token auth for the API
+    'rest_framework.authtoken',
+
     # Third-party
     'crispy_forms',
     'djangobower',
@@ -190,6 +193,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
