@@ -1,6 +1,7 @@
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from datetime import date
+import json
 import time
 
 import django.db
@@ -9,7 +10,7 @@ from django.db.models import Sum
 from django.http import Http404
 import pandas
 from rest_framework import filters, viewsets
-from rest_framework.decorators import action, link
+from rest_framework.decorators import detail_route, list_route
 from rest_framework import exceptions
 from rest_framework.response import Response
 
@@ -25,7 +26,7 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Account.objects.all()
     serializer_class = serializers.AccountSerializer
 
-    @link()
+    @detail_route()
     def transactions(self, request, format=None, pk=None):
         if pk:
             request.GET = {"account": pk}
@@ -33,7 +34,7 @@ class AccountViewSet(viewsets.ReadOnlyModelViewSet):
         else:
             raise Http404()
 
-    @action()
+    @detail_route(methods=['post'])
     def sync(self, request, format=None, pk=None):
         account = self.get_object()
         new_trx = account.sync()
@@ -59,6 +60,15 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.TransactionSerializer
     filter_backends = (filters.OrderingFilter, filters.DjangoFilterBackend)
     filter_fields = ("account",)
+
+    @list_route()
+    def by_date(self, request):
+        transactions = self.get_queryset()
+        by_date = defaultdict(list)
+        for t in transactions:
+            by_date[t.date].append(self.get_serializer(t).data)
+        #data = json.dumps(by_date)
+        return Response(by_date)
 
 
 class SummaryStatsViewSet(viewsets.ViewSet):

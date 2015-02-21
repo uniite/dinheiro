@@ -5,7 +5,7 @@ from finance.models import Account, Category, CategoryRule, Institution, Transac
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    censored_account_number = serializers.SerializerMethodField("get_censored_account_number")
+    #censored_account_number = serializers.SerializerMethodField("get_censored_account_number")
 
     class Meta:
         model = Account
@@ -22,7 +22,7 @@ class InstitutionSerializer(serializers.ModelSerializer):
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    amount = serializers.SerializerMethodField("get_amount")
+    #amount = serializers.SerializerMethodField("get_amount")
 
     class Meta:
         model = Transaction
