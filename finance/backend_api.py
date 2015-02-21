@@ -56,6 +56,7 @@ class Client(object):
         while True:
             msgs = self.response_queue.get_messages(wait_time_seconds=20)
             if len(msgs) == 0:
+                tries -= 1
                 continue
             msg = msgs[0]
             body = msg.get_body()
