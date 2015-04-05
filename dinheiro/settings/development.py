@@ -27,3 +27,20 @@ else:
         }
     }
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {},
+    'loggers': {
+        'django.request': {
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}

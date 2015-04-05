@@ -111,6 +111,8 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'middleware.detailed_logging.DetailedLoggingMiddleware',
+    'middleware.exception_logging.ExceptionLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -118,8 +120,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'middleware.exception_logging.ExceptionLoggingMiddleware',
 )
 
 ROOT_URLCONF = 'dinheiro.urls'
