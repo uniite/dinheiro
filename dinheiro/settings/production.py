@@ -17,12 +17,7 @@ DATABASES = {
         'USER': os.environ['DB_USER'],
         'PASSWORD': os.environ['DB_PASSWORD'],
         'HOST': os.environ['DB_HOST'],
-        'PORT': os.environ.get('DB_PORT', 3306),
-        'OPTIONS': {
-            'ssl': {
-                'ca': os.environ.get('DB_CA_PATH', '/app/config/rds-ca-2015-root.pem')
-            }
-        }
+        'PORT': os.environ.get('DB_PORT', 3306)
     }
 }
 
