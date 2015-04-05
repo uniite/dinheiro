@@ -20,7 +20,7 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', 3306),
         'OPTIONS': {
             'ssl': {
-                'ca': os.environ.get('DB_CA_PATH', '/app/config/rds-ca-2015-us-east-1.pem')
+                'ca': os.environ.get('DB_CA_PATH', '/app/config/rds-ca-2015-root.pem')
             }
         }
     }
